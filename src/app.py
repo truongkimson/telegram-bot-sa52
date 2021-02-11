@@ -7,8 +7,8 @@ TOKEN = bot_token
 bot = telegram.Bot(token=TOKEN)
 
 def test_scheduled_reminder():
-    msg = f"** TESTING **\nGentle reminder to submit your temperature.\nThis message is sent at {time.strftime('%H:%M:%S', time.localtime())}"
-    bot.send_message(chat_id=test_group_chat_id, text=msg)
+    msg = f"** TESTING **\nGood Morning! This message is scheduled every morning.\nThis message was sent at {time.strftime('%H:%M:%S', time.localtime())}\nHosted on Heroku."
+    bot.send_message(chat_id=servant_group_chat_id, text=msg)
 
 
 def main():
