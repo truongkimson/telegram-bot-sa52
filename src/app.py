@@ -16,11 +16,12 @@ def test_scheduled_reminder():
 
 def main():
     # schedule.every().day.at("02:25").do(test_scheduled_reminder)
-    schedule.every(5).seconds.do(test_scheduled_reminder)
+    # schedule.every(5).seconds.do(test_scheduled_reminder)
 
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    # while True:
+    #     schedule.run_pending()
+    #     time.sleep(1)
+    test_scheduled_reminder()
 
 if __name__ == '__main__':
     main()
