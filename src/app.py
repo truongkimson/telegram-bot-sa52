@@ -13,7 +13,7 @@ def test_scheduled_reminder():
     bot.send_message(chat_id=test_group_chat_id, text=msg)
 
 
-schedule.every().day.at("01:1").do(test_scheduled_reminder)
+schedule.every().day.at("01:15").do(test_scheduled_reminder)
 
 
 while True:
