@@ -16,7 +16,7 @@ def test_scheduled_reminder():
 # def test_interval():
 #     test_scheduled_reminder()
 
-@sched.scheduled_job('cron', days_of_week='mon-fri', hour=14, minute=24)
+@sched.scheduled_job('cron', day_of_week='mon-fri', hour=14, minute=24)
 def test_cron():
     test_scheduled_reminder()
 
