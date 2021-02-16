@@ -25,8 +25,9 @@ def respond():
 
     chat_id = update.message.chat.id
     msg_id = update.message.message_id
+    update_id = update.update_id
     text = update.message.text.encode('utf-8').decode()
-    print(text)
+    print(update_id, text)
 
     if text == '/start':
         welcome_msg = '''
