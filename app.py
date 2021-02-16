@@ -35,7 +35,7 @@ Hi there!
 I'm Ale's assistant.
         '''
         bot.send_message(chat_id=chat_id, text=welcome_msg, reply_to_message_id=msg_id)
-    return
+    return 'ok'
 
 if __name__ == '__main__':
     app.run(threaded=True)
