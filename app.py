@@ -35,10 +35,10 @@ I'm Ale's assistant.
         '''
         bot.send_message(chat_id=chat_id, text=welcome_msg, reply_to_message_id=msg_id)
 
-    if text == '/hello':
-        user_first_name = update.message.from.first_name
-        hello_msg = f'Hello {user_first_name}!'
-        bot.send_message(chat_id=chat_id, text=hello_msg, reply_to_message_id=msg_id)
+    # if text == '/hello':
+    #     user_first_name = update.message.from.first_name
+    #     hello_msg = f'Hello {user_first_name}!'
+    #     bot.send_message(chat_id=chat_id, text=hello_msg, reply_to_message_id=msg_id)
 
     return 'ok'
 
