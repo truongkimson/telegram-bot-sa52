@@ -11,6 +11,14 @@ app = Flask(__name__)
 def index():
     return 'Welcome'
 
+@app.route('/set_webhook', methods=['GET', 'POST'])
+def set_webhook():
+    s = bot.set_webhook(f'{URL}/{TOKEN}')
+    if s:
+        return "webhook set successfully"
+    else:
+        return "webhook set unsuccessfully"
+
 @app.route(f'/{TOKEN}', methods=['POST'])
 def respond():
     update = telegram.Update.de_json(request.get_json(force=True), bot)
