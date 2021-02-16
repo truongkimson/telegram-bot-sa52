@@ -30,6 +30,7 @@ def respond():
         text = update.message.text.encode('utf-8').decode()
     except AttributeError as error:
         print(error)
+        return 'emptry text'
     print(update_id, text)
 
     if text == '/start':
