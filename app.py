@@ -21,6 +21,7 @@ def set_webhook():
 
 @app.route(f'/{TOKEN}', methods=['POST'])
 def respond():
+    print("Received request")
     print(request.get_json())
     # update = telegram.Update.de_json(request.get_json(force=True), bot)
 
