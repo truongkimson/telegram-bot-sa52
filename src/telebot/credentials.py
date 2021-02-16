@@ -3,4 +3,4 @@ bot_user_name = 'sa52_bot'
 test_group_chat_id = -580518273
 servant_group_chat_id = -1001450618706
 sa52_group_chat_id = -1001274542597
-URL = ''
+URL = 'https://polar-ridge-56723.herokuapp.com/'
