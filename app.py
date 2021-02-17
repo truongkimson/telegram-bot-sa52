@@ -46,5 +46,10 @@ I'm Ale's assistant.
 
     return 'ok'
 
+@app.route('/get_webhook_info')
+def get_webhook_info():
+    webhook_info = bot.get_webhook_info()
+    return webhook_info
+
 if __name__ == '__main__':
     app.run(threaded=True)
