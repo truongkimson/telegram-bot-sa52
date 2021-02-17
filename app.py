@@ -2,7 +2,7 @@ from flask import Flask, request
 from requests.api import get
 import telegram
 from telebot.credentials import bot_token, bot_user_name, URL
-from telebot import meme
+from telebot import meme, stock
 
 TOKEN = bot_token
 bot = telegram.Bot(token=TOKEN)
@@ -50,6 +50,14 @@ I'm Ale's assistant.
     elif text == '/meme' or text == f'/meme@{bot_user_name}':
         url = meme.get_random_meme()
         bot.send_photo(chat_id=chat_id, photo=url)
+
+    elif text.startswith('/stock') or text.startswith(f'/stock@{bot_user_name}'):
+        try:
+            symbol = text.trim().split()[1]
+            quote_msg = stock.get_quote(symbol)
+        except IndexError:
+            quote_msg = "Command usage: /stock [symbol]"
+        bot.send_message(chat_id=chat_id, text=quote_msg, reply_to_message_id=msg_id, parse_mode='HTML')
         
     elif update.message.reply_to_message:
         reply_msg = 'Sorry I don\'t understand'
