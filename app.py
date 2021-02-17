@@ -48,7 +48,7 @@ Commands available
 /hello - Say hello to you
 /meme - Send a random meme scraped from reddit
 /stock - Check stock price. Usage: /stock [symbol]
-'''
+'''     bot.send_message(chat_id=chat_id, text=help_msg, reply_to_message_id=msg_id)
 
     elif text == '/hello' or text == f'/hello@{bot_user_name}':
         user_first_name = update.message.from_user.first_name
