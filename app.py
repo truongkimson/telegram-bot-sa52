@@ -29,14 +29,9 @@ def respond():
     if update.message.text:
         chat_id = update.message.chat.id
         msg_id = update.message.message_id
+        text = update.message.text.encode('utf-8').decode()
     else:
         return 'ok'
-
-    text = update.message.text.encode('utf-8').decode()
-
-    if update.message.reply_to_message:
-        reply_msg = 'Sorry I don\'t understand'
-        bot.send_message(chat_id=chat_id, text=reply_msg, reply_to_message_id=msg_id)
 
     if text == '/start':
         welcome_msg = '''
@@ -45,10 +40,14 @@ I'm Ale's assistant.
         '''
         bot.send_message(chat_id=chat_id, text=welcome_msg, reply_to_message_id=msg_id)
 
-    if text == '/hello':
+    elif text == '/hello':
         user_first_name = update.message.from_user.first_name
         hello_msg = f'Hello {user_first_name}!'
         bot.send_message(chat_id=chat_id, text=hello_msg, reply_to_message_id=msg_id)
+        
+    elif update.message.reply_to_message:
+        reply_msg = 'Sorry I don\'t understand'
+        bot.send_message(chat_id=chat_id, text=reply_msg, reply_to_message_id=msg_id)
 
     return 'ok'
 
