@@ -39,8 +39,16 @@ def respond():
         welcome_msg = '''
 Hi there!
 I'm Ale's assistant.
-        '''
+'''
         bot.send_message(chat_id=chat_id, text=welcome_msg, reply_to_message_id=msg_id)
+    elif text == '/start' or text == f'/start@{bot_user_name}':
+        help_msg = '''
+Commands available
+/help - Show help
+/hello - Say hello to you
+/meme - Send a random meme scraped from reddit
+/stock - Check stock price. Usage: /stock [symbol]
+'''
 
     elif text == '/hello' or text == f'/hello@{bot_user_name}':
         user_first_name = update.message.from_user.first_name
