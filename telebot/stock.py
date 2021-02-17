@@ -10,8 +10,8 @@ def get_quote(symbol):
     parsed_intraday = json.loads(intraday.text)
 
     quote_string = f'''
-    <p>${parsed_quote["symbol"]} {parsed_quote["companyName"]}<p>
-    ${parsed_quote["latestPrice"]:,.2f}
+    <b>${parsed_quote["symbol"]} {parsed_quote["companyName"]}</b>
+    <b>${parsed_quote["latestPrice"]:,.2f}</b>
     Previous close: ${parsed_quote["previousClose"]:,.2f}
     Change: ${parsed_quote["change"]:,.2f}      % Change: {parsed_quote["changePercent"]:.2%}
     Market cap: {int(parsed_quote["marketCap"]/10e6):,}M    P/E: {parsed_quote["peRatio"]}
