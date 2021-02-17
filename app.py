@@ -35,7 +35,7 @@ def respond():
     else:
         return 'ok'
 
-    if text == '/start':
+    if text == '/start' or text == f'/start@{bot_user_name}':
         welcome_msg = '''
 Hi there!
 I'm Ale's assistant.
