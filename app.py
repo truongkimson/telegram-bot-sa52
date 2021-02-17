@@ -53,7 +53,7 @@ I'm Ale's assistant.
 
     elif text.startswith('/stock') or text.startswith(f'/stock@{bot_user_name}'):
         try:
-            symbol = text.trim().split()[1]
+            symbol = text.strip().split()[1]
             quote_msg = stock.get_quote(symbol)
         except IndexError:
             quote_msg = "Command usage: /stock [symbol]"
