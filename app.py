@@ -57,7 +57,7 @@ I'm Ale's assistant.
             quote_msg = stock.get_quote(symbol)
         except IndexError:
             quote_msg = "Command usage: /stock [symbol]"
-        bot.send_message(chat_id=chat_id, text=quote_msg, reply_to_message_id=msg_id, parse_mode='HTML')
+        bot.send_message(chat_id=chat_id, text=quote_msg, reply_to_message_id=msg_id)
         
     elif update.message.reply_to_message:
         reply_msg = 'Sorry I don\'t understand'
