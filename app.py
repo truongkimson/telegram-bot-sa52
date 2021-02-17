@@ -1,6 +1,8 @@
 from flask import Flask, request
+from requests.api import get
 import telegram
 from telebot.credentials import bot_token, bot_user_name, URL
+from telebot.meme import get_random_meme
 
 TOKEN = bot_token
 bot = telegram.Bot(token=TOKEN)
@@ -44,6 +46,10 @@ I'm Ale's assistant.
         user_first_name = update.message.from_user.first_name
         hello_msg = f'Hello {user_first_name}!'
         bot.send_message(chat_id=chat_id, text=hello_msg, reply_to_message_id=msg_id)
+
+    elif text == '/meme':
+        url = get_random_meme()
+        bot.send_photo(chat_id=chat_id, photo=url)
         
     elif update.message.reply_to_message:
         reply_msg = 'Sorry I don\'t understand'
