@@ -41,7 +41,8 @@ Hi there!
 I'm Ale's assistant.
 '''
         bot.send_message(chat_id=chat_id, text=welcome_msg, reply_to_message_id=msg_id)
-    elif text == '/start' or text == f'/start@{bot_user_name}':
+
+    elif text == '/help' or text == f'/help@{bot_user_name}':
         help_msg = '''
 Commands available
 /help - Show help
