@@ -4,10 +4,14 @@ from .credentials import iex_token
 
 def get_quote(symbol):
     quote = requests.get(f'https://cloud.iexapis.com/stable/stock/{symbol}/quote?token={iex_token}')
-    parsed_quote = json.loads(quote.text)
+    if quote.text == 'Unknown symbol':
+        quote_string = 'You have entered an invalid symbol. Please try again'
+        return quote_string
+    else:
+        parsed_quote = json.loads(quote.text)
 
-    intraday = requests.get(f'https://cloud.iexapis.com/stable/stock/{symbol}/intraday-prices?chartLast=1&token={iex_token}')
-    parsed_intraday = json.loads(intraday.text)
+    # intraday = requests.get(f'https://cloud.iexapis.com/stable/stock/{symbol}/intraday-prices?chartLast=1&token={iex_token}')
+    # parsed_intraday = json.loads(intraday.text)
 
     quote_string = f'''
     <b>${parsed_quote["symbol"]} {parsed_quote["companyName"]}</b>
