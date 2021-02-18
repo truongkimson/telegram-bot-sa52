@@ -19,7 +19,7 @@ def get_quote(symbol):
     Previous close: ${parsed_quote["previousClose"]:,.2f}
     Change: ${parsed_quote["change"]:,.2f}      % Change: {parsed_quote["changePercent"]:.2%}
     Market cap: {int(parsed_quote["marketCap"]/10e6):,}M    P/E: {parsed_quote["peRatio"]}
-    <a href="https://iexcloud.io">IEX Cloud</a>
+    Data by <a href="https://iexcloud.io">IEX Cloud</a>
     '''
     # with open('quote.json', 'w') as f:
     # f.write(json.dumps(parsed_quote, indent=4, sort_keys=True))

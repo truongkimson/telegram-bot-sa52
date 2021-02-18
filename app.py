@@ -68,7 +68,8 @@ Commands available
             quote_msg = stock.get_quote(symbol)
         except IndexError:
             quote_msg = "Command usage: /stock [symbol]"
-        bot.send_message(chat_id=chat_id, text=quote_msg, reply_to_message_id=msg_id, parse_mode='HTML')
+        bot.send_message(chat_id=chat_id, text=quote_msg, reply_to_message_id=msg_id,
+                        parse_mode='HTML', disable_web_page_preview=True)
         
     elif update.message.reply_to_message:
         reply_msg = 'Sorry I don\'t understand'
@@ -82,7 +83,7 @@ def get_webhook_info():
     webhook_info = bot.get_webhook_info()
     return vars(webhook_info)
 
-@app.route('/clear_updates/<update_id>')
+@app.route('/clear_updates/<int:update_id>')
 def clear_updates(update_id):
     r = requests.get(f'https://api.telegram.org/bot{bot_token}/setWebhook?url=')
     print(r)
