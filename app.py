@@ -84,10 +84,10 @@ def get_webhook_info():
 
 @app.route('/clear_updates')
 def clear_updates():
-    update_id = request.get_json()['update_id']
     r = requests.get(f'https://api.telegram.org/bot{bot_token}/setWebhook?url=')
     print(r)
-    r = requests.get(f'https://api.telegram.org/bot{bot_token}/getUpdate?offset={update_id}')
+    r = requests.get(f'https://api.telegram.org/bot{bot_token}/getUpdate')
+    print(r)
 
 if __name__ == '__main__':
     app.run(threaded=True)
