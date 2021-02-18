@@ -86,7 +86,7 @@ def get_webhook_info():
 def clear_updates(update_id):
     r = requests.get(f'https://api.telegram.org/bot{bot_token}/setWebhook?url=')
     print(r)
-    r = requests.get(f'https://api.telegram.org/bot{bot_token}/getUpdate?offset={update_id}')
+    r = requests.get(f'https://api.telegram.org/bot{bot_token}/getUpdates?offset={update_id}')
     print(r)
     return update_id
 
