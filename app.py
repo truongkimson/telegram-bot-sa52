@@ -88,6 +88,7 @@ def clear_updates():
     print(r)
     r = requests.get(f'https://api.telegram.org/bot{bot_token}/getUpdate')
     print(r)
+    return 'ok'
 
 if __name__ == '__main__':
     app.run(threaded=True)
