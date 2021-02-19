@@ -5,3 +5,4 @@ servant_group_chat_id = -1001450618706
 sa52_group_chat_id = -1001274542597
 URL = 'https://polar-ridge-56723.herokuapp.com/'
 iex_token = 'pk_c4f42520270e441782d3b3fd538fe0f7'
+yamete_file_id = 'CQACAgUAAxkBAAIBAAFgL8dENaCXgJ5OZkuaPRwCeWWrAwACvgEAAnj0eVVz0OvsNr2Hqh4E'
