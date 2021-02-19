@@ -58,6 +58,12 @@ Commands available
         hello_msg = f'Hello {user_first_name}!'
         bot.send_message(chat_id=chat_id, text=hello_msg, reply_to_message_id=msg_id)
 
+    elif text == '/punish' or text == f'/punish@{bot_user_name}':
+        user_first_name = update.message.from_user.first_name
+        punish_msg = 'Yamete kudasai~'
+        bot.send_message(chat_id=chat_id, text=punish_msg, reply_to_message_id=msg_id)
+    
+
     elif text == '/meme' or text == f'/meme@{bot_user_name}':
         url = meme.get_random_meme()
         bot.send_photo(chat_id=chat_id, photo=url)
