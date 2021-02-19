@@ -62,7 +62,10 @@ Commands available
         user_first_name = update.message.from_user.first_name
         punish_msg = 'Yamete kudasai~'
         bot.send_message(chat_id=chat_id, text=punish_msg, reply_to_message_id=msg_id)
-        bot.send_voice(chat_id=chat_id, voice=yamete_file_id, reply_to_message_id=msg_id)
+        try:
+            bot.send_voice(chat_id=chat_id, voice=yamete_file_id, reply_to_message_id=msg_id)
+        except Exception as e:
+            print(e)
     
 
     elif text == '/meme' or text == f'/meme@{bot_user_name}':
