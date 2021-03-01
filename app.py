@@ -15,15 +15,6 @@ def index():
     return 'Welcome'
 
 
-@app.route('/set_webhook', methods=['GET', 'POST'])
-def set_webhook():
-    s = bot.set_webhook(f'{URL}/{TOKEN}')
-    if s:
-        return "webhook set successfully"
-    else:
-        return "webhook set unsuccessfully"
-
-
 @app.route(f'/{TOKEN}', methods=['POST'])
 def respond():
     print(request.get_json())
@@ -41,7 +32,7 @@ def respond():
         text = update_message.text.encode('utf-8').decode()
     except AttributeError as e:
         print(e)
-        print("update")
+        print(update_message)
         return 'ok'
 
     if text == '/start' or text == f'/start@{bot_user_name}':
@@ -104,6 +95,7 @@ def get_webhook_info():
     webhook_info = bot.get_webhook_info()
     return vars(webhook_info)
 
+
 @app.route('/clear_updates/<int:update_id>')
 def clear_updates(update_id):
     r = requests.get(f'https://api.telegram.org/bot{bot_token}/setWebhook?url=')
@@ -111,6 +103,23 @@ def clear_updates(update_id):
     r = requests.get(f'https://api.telegram.org/bot{bot_token}/getUpdates?offset={update_id}')
     print(r)
     return update_id
+
+
+@app.route('/set_webhook', methods=['GET', 'POST'])
+def set_webhook():
+    s = bot.set_webhook(f'{URL}/{TOKEN}')
+    if s:
+        return "webhook set successfully"
+    else:
+        return "webhook set unsuccessfully"
+
+
+@app.route('/luminus_announcement', methods=['POST'])
+def luminus_announcement():
+    if request.method == 'POST':
+        print(request)
+    return
+
 
 if __name__ == '__main__':
     app.run(threaded=True)
