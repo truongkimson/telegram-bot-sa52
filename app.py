@@ -29,11 +29,19 @@ def respond():
     print(request.get_json())
     update = telegram.Update.de_json(request.get_json(), bot)
 
-    if update.message.text:
-        chat_id = update.message.chat.id
-        msg_id = update.message.message_id
-        text = update.message.text.encode('utf-8').decode()
-    else:
+    try:
+        if update.message:
+            update_message = update.message
+        elif update.edited_message:
+            update_message = update.edited_message
+        else:
+            return 'ok'
+        chat_id = update_message.chat.id
+        msg_id = update_message.message_id
+        text = update_message.text.encode('utf-8').decode()
+    except AttributeError as e:
+        print(e)
+        print("update")
         return 'ok'
 
     if text == '/start' or text == f'/start@{bot_user_name}':
