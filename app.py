@@ -117,9 +117,9 @@ def set_webhook():
 @app.route('/luminus_announcement', methods=['POST'])
 def luminus_announcement():
     if request.method == 'POST':
-        email = request.get_json()
+        email_trigger = request.get_json()
         
-        announce_message, chat_id = email.get_luminus_announcement(email)
+        announce_message, chat_id = email.get_luminus_announcement(email_trigger)
         bot.send_message(chat_id=chat_id, text=announce_message)
     return 'ok'
 
