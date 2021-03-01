@@ -1,4 +1,4 @@
-from .credentials import test_group_chat_id, servant_group_chat_id
+from .credentials import test_group_chat_id, servant_group_chat_id, sa52_group_chat_id
 
 def get_luminus_announcement(email):
     sender = email['sender']

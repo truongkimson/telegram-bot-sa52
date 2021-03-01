@@ -118,7 +118,8 @@ def set_webhook():
 def luminus_announcement():
     if request.method == 'POST':
         email_trigger = request.get_json()
-        
+        print(email_trigger['sender'], email_trigger['subject'])
+
         announce_message, chat_id = email.get_luminus_announcement(email_trigger)
         bot.send_message(chat_id=chat_id, text=announce_message)
     return 'ok'
