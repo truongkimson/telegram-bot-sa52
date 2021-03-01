@@ -11,5 +11,5 @@ Update from {sender}!
 {body}
 """
 
-    chat_id = test_group_chat_id
+    chat_id = servant_group_chat_id
     return announce_message, chat_id
