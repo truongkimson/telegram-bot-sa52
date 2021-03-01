@@ -117,7 +117,7 @@ def set_webhook():
 @app.route('/luminus_announcement', methods=['POST'])
 def luminus_announcement():
     if request.method == 'POST':
-        print(request.values)
+        print(request.data)
     return 'ok'
 
 
