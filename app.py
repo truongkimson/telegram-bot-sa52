@@ -3,7 +3,7 @@ import requests
 from flask import Flask, request
 from requests.api import get
 from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id
-from telebot import meme, stock
+from telebot import meme, stock, email
 
 TOKEN = bot_token
 bot = telegram.Bot(token=TOKEN)
@@ -117,7 +117,10 @@ def set_webhook():
 @app.route('/luminus_announcement', methods=['POST'])
 def luminus_announcement():
     if request.method == 'POST':
-        print(request.get_json())
+        email = request.get_json()
+        
+        announce_message, chat_id = email.get_luminus_announcement(email)
+        bot.send_message(chat_id=chat_id, text=announce_message)
     return 'ok'
 
 
