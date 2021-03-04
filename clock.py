@@ -18,7 +18,7 @@ job_schedule = [
         'trigger': 'cron',
         'dow': '*',
         'hour': 11,
-        'minute': 22,
+        'minute': 35,
         'func': send_announcement,
         'msg': f"Hi All,\nRemember to submit your temperature before class today \U0001F60A.\n\n{time.strftime('%H:%M:%S', time.localtime())}",
         'chat_id': test_group_chat_id
