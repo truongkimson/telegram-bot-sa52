@@ -6,8 +6,9 @@ def get_luminus_announcement(email):
     body = email['body']
 
     announce_message = f"""
-Update from {sender}!
+Update from <b>{sender}</b>!
 {subject}
+
 {body}
 """
 
