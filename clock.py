@@ -36,5 +36,6 @@ job_schedule = [
 ]
 
 for j in job_schedule:
-    sched.add_job(j['func'], j['trigger'], day_of_week=j['dow'], hour=j['hour'], minute=j['minute'], id='test0', args=(j['chat_id'], j['msg']))
+    sched.add_job(j['func'], args=(j['chat_id'], j['msg']), trigger=j['trigger'], day_of_week=j['dow'], hour=j['hour'], minute=j['minute'],
+                    id='test0', misfire_grace_time=20, replace_existing=True)
 sched.start()
