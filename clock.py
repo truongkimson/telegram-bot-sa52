@@ -18,7 +18,7 @@ job_schedule = [
         'trigger': 'cron',
         'dow': '*',
         'hour': 11,
-        'minute': 40,
+        'minute': 45,
         'func': send_announcement,
         'msg': f"Hi All,\nRemember to submit your temperature before class today \U0001F60A.\n\n{time.strftime('%H:%M:%S', time.localtime())}",
         'chat_id': test_group_chat_id
@@ -36,6 +36,6 @@ job_schedule = [
 ]
 
 for j in job_schedule:
-    sched.add_job(j['func'], args=(j['chat_id'], j['msg']), trigger=j['trigger'], day_of_week=j['dow'], hour=j['hour'], minute=j['minute'],
-                    id='test0', misfire_grace_time=20, replace_existing=True)
+    sched.add_job(j['func'], args=(j['chat_id'], j['msg']), trigger=j['trigger'],
+                    day_of_week=j['dow'], hour=j['hour'], minute=j['minute'], id=j['id'], misfire_grace_time=20)
 sched.start()
