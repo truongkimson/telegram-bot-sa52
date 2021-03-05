@@ -22,7 +22,7 @@ job_schedule = [
         'hour': 11,
         'minute': 45,
         'func': send_announcement,
-        'msg': f"Hi All,\nRemember to submit your temperature before class today \U0001F60A.\n\n{time.strftime('%H:%M:%S', time.localtime())}",
+        'msg': f"Hi All,\nRemember to submit your temperature before class today \U0001F60A.\n\n",
         'chat_id': test_group_chat_id
     },
     {
@@ -34,7 +34,7 @@ job_schedule = [
         'hour': 8,
         'minute': 0,
         'func': send_announcement,
-        'msg': f"Hi All,\nRemember to submit your temperature before class today \U0001F60A.\n\n{time.strftime('%H:%M:%S', time.localtime())}",
+        'msg': f"Hi All,\nRemember to submit your temperature before class today \U0001F60A.\n\n",
         'chat_id': sa52_group_chat_id
     },
     {

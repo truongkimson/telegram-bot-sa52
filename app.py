@@ -117,7 +117,7 @@ def set_webhook():
 @app.route('/luminus_announcement', methods=['POST'])
 def luminus_announcement():
     email_trigger = request.get_json()
-    print(email_trigger)
+    print(email_trigger['message']['data'])
     return 'ok'
 
 
