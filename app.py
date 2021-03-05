@@ -1,5 +1,7 @@
 import telegram
 import requests
+import base64
+from dateutil import parser
 from flask import Flask, request
 from requests.api import get
 from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id
@@ -117,7 +119,7 @@ def set_webhook():
 @app.route('/luminus_announcement', methods=['POST'])
 def luminus_announcement():
     email_trigger = request.get_json()
-    print(email_trigger['message']['data'])
+    print(parser.isoparse(email_trigger['message']['publish_time'], base64.b64decode(email_trigger['message']['data']))
     return 'ok'
 
 
