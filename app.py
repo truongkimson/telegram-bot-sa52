@@ -25,6 +25,7 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 API_SERVICE_NAME = 'gmail'
 API_VERSION = 'v1'
 history_id = None
+client_ready = False
 
 try:
     with open('gmail/gmail_token.pickle', 'rb') as token:
@@ -206,6 +207,7 @@ def authorize():
 
 @app.route('/gmail/oauth2callback')
 def oauth2callback():
+    global client_ready
     # Specify the state when creating the flow in the callback so that it can
     # verify the authorization server response.
     state = flask.session['state']
@@ -219,6 +221,7 @@ def oauth2callback():
     creds = flow.credentials
     with open('gmail/gmail_token.pickle', 'wb') as token:
         pickle.dump(creds, token)
+    client_ready = True
     
     return flask.redirect(flask.url_for('test_api_request'))
 
