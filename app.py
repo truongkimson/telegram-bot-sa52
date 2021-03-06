@@ -280,7 +280,7 @@ def luminus_announcement():
 
 def print_index_table():
   return ('<table>' +
-          '<tr><td><a href="test">Test an API request</a></td>' +
+          '<tr><td><a href="/test">Test an API request</a></td>' +
           '<td>Submit an API request and see a formatted JSON response. ' +
           '    Go through the authorization flow if there are no stored ' +
           '    credentials for the user.</td></tr>' +
