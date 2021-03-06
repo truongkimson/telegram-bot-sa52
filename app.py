@@ -287,7 +287,7 @@ def luminus_announcement():
                                         msg += received_date.strftime('%a, %d %b, %y %H:%M\n')
                                     if (part.get_content_type() == 'text/plain'):
                                         msg += trim_message(part.get_content()) + '--truncated'
-                                        msg = msg[:150]
+                                        msg = msg[:300]
                                         print(msg)
                                         bot.send_message(chat_id=test_group_chat_id, text=msg)
         history_id = history_list['historyId']
