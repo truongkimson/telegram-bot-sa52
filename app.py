@@ -325,4 +325,5 @@ def print_index_table():
 
 if __name__ == '__main__':
     # os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-    app.run(threaded=True, debug=True)
+    # app.run('localhost', 8080, threaded=True, debug=True)
+    app.run(threaded=True)
