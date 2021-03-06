@@ -7,10 +7,10 @@ import pickle
 import flask
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
+import dateutil
 from datetime import datetime
 from google.auth.transport.requests import Request
 from werkzeug.utils import redirect
-from dateutil import parser
 from flask import Flask, request
 from requests.api import get
 from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id, test_group_chat_id
@@ -282,7 +282,8 @@ def luminus_announcement():
                                 for part in att.walk():
                                     if 'From' in part:
                                         msg += f'Update from: {part.get("From")}\n'
-                                        received_date = datetime.strptime(part.get('Date'), '%a, %d %b %Y %H:%M:%S %z').astimezone(tz='Asia/Singapore')
+                                        received_date = datetime.strptime(part.get('Date'), '%a, %d %b %Y %H:%M:%S %z')\
+                                            .astimezone(tz=dateutil.tz.gettz('Asia/Singapore'))
                                         msg += received_date.strftime('%H:%M %a, %d %b, %y \n')
                                         msg += f'Subject: {part.get("Subject")}\n\n'
                                     if (part.get_content_type() == 'text/plain'):
