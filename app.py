@@ -7,7 +7,7 @@ import pickle
 import flask
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
-import dateutil
+from dateutil.tz import gettz
 from datetime import datetime
 from google.auth.transport.requests import Request
 from werkzeug.utils import redirect
@@ -283,7 +283,7 @@ def luminus_announcement():
                                     if 'From' in part:
                                         msg += f'Update from: {part.get("From")}\n'
                                         received_date = datetime.strptime(part.get('Date'), '%a, %d %b %Y %H:%M:%S %z')\
-                                            .astimezone(tz=dateutil.tz.gettz('Asia/Singapore'))
+                                            .astimezone(tz=gettz('Asia/Singapore'))
                                         msg += received_date.strftime('%H:%M %a, %d %b, %y \n')
                                         msg += f'Subject: {part.get("Subject")}\n\n'
                                     if (part.get_content_type() == 'text/plain'):
