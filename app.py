@@ -5,6 +5,7 @@ import email
 import base64
 import pickle
 import flask
+import datetime
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 from google.auth.transport.requests import Request
@@ -14,7 +15,7 @@ from flask import Flask, request
 from requests.api import get
 from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id, test_group_chat_id
 from telebot import meme, stock
-from gmail.utils import shorten_message
+from gmail.utils import trim_message
 
 # Telegram bot token and create bot instance
 TOKEN = bot_token
@@ -262,6 +263,8 @@ def clear_credentials():
 def luminus_announcement():
     if client_ready:
         global history_id
+        msg = ''
+
         history_list = gmail.users().history().list(userId='me', historyTypes=['messageAdded'],
             labelId='INBOX', startHistoryId=history_id).execute()
         if 'history' in history_list:
@@ -278,12 +281,15 @@ def luminus_announcement():
                             for att in attachments:
                                 for part in att.walk():
                                     if 'From' in part:
-                                        print(part.get('From'))
-                                        print(part.get('Subject'))
-                                        print(part.get('Date'))
+                                        msg += f'Update from: {part.get("From")}\n'
+                                        msg += f'Subject {part.get("Subject")}\n'
+                                        received_date = datetime.fromisoformat(part.get('Date'))
+                                        msg += received_date.strftime('%a, %d %b, %y %H:%M\n')
                                     if (part.get_content_type() == 'text/plain'):
-                                        print(shorten_message(part.get_content()))
-
+                                        msg += trim_message(part.get_content()) + '--truncated'
+                                        msg = msg[:150]
+        print(msg)
+        bot.send_message(chat_id=test_group_chat_id, text=msg)
         history_id = history_list['historyId']
         return 'ok'
     else:
