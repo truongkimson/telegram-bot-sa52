@@ -1,16 +1,60 @@
+import os
 import telegram
 import requests
+import email
 import base64
+import pickle
+import flask
+import google_auth_oauthlib.flow
+import googleapiclient.discovery
+from google.auth.transport.requests import Request
+from werkzeug.utils import redirect
 from dateutil import parser
 from flask import Flask, request
 from requests.api import get
-from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id
-from telebot import meme, stock, email
+from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id, test_group_chat_id
+from telebot import meme, stock
 
+# Telegram bot token and create bot instance
 TOKEN = bot_token
 bot = telegram.Bot(token=TOKEN)
 
+# Gmail client credentials
+CLIENT_SECRETS_FILE = 'gmail/client_id.json'
+SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+API_SERVICE_NAME = 'gmail'
+API_VERSION = 'v1'
+history_id = None
+
+try:
+    with open('gmail/gmail_token.pickle', 'rb') as token:
+        creds = pickle.load(token)
+        if not creds.valid:
+            if creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+                
+    gmail = googleapiclient.discovery.build(API_SERVICE_NAME, API_VERSION, credentials=creds)
+    request = {
+        'labelIds': ['INBOX'],
+        'topicName': 'projects/thinking-banner-284203/topics/luminus-gmail-forward'
+    }
+    # save history_id returned by watch() call
+    history_id = gmail.users().watch(userId='me', body=request).execute()['historyId']
+
+    # save creds to pickle in case access token is refreshed
+    with open('gmail/gmail_token.pickle', 'wb') as token:
+        pickle.dump(creds, token)
+    client_ready = True
+    print(f'Gmail client is ready. HistoryId={history_id}')
+except Exception as e:
+    print(f'Gmail client not instantiated. Error occured: {e}')
+    client_ready = False
+
+# start Flask app
 app = Flask(__name__)
+# set secret_key for sessions
+app.secret_key = b'3fds9*(#*)(fl232#(LK!@_fdAavnmk:'
+
 
 @app.route('/')
 def index():
@@ -115,13 +159,145 @@ def set_webhook():
     else:
         return "webhook set unsuccessfully"
 
+# gmail API
+@app.route('/gmail')
+def gmail_index():
+    return print_index_table()
 
-@app.route('/luminus_announcement', methods=['POST'])
+
+@app.route('/gmail/test')
+def test_api_request():
+    # check if pickled credential object is available, if not redirect to /authorize
+    if not os.path.exists('gmail/gmail_token.pickle'):
+        return redirect(flask.url_for('authorize'))
+
+    # load pickle into creds, check if still valid
+    with open('gmail/gmail_token.pickle', 'rb') as token:
+        creds = pickle.load(token)
+    if not creds.valid:
+        if creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            return redirect(flask.url_for('authorize'))
+
+    # call Gmail API using creds credential
+    gmail = googleapiclient.discovery.build(API_SERVICE_NAME, API_VERSION, credentials=creds)
+    msg_list = gmail.users().messages().list(userId='me', labelIds=['INBOX']).execute()
+
+    # save creds to pickle in case access token is refreshed
+    with open('gmail/gmail_token.pickle', 'wb') as token:
+        pickle.dump(creds, token)
+
+    return flask.jsonify(msg_list)
+
+
+@app.route('/gmail/authorize')
+def authorize():
+    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, scopes=SCOPES)
+    flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
+
+    authorization_url, state = flow.authorization_url(access_type='offline')
+    # Store the state so the callback can verify the auth server response.
+    flask.session['state'] = state
+
+    return redirect(authorization_url)
+
+
+@app.route('/gmail/oauth2callback')
+def oauth2callback():
+    # Specify the state when creating the flow in the callback so that it can
+    # verify the authorization server response.
+    state = flask.session['state']
+    authorization_response = request.url
+
+    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
+    flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
+    # state is used to verify reponse here
+    flow.fetch_token(authorization_response=authorization_response)
+
+    creds = flow.credentials
+    with open('gmail/gmail_token.pickle', 'wb') as token:
+        pickle.dump(creds, token)
+    
+    return flask.redirect(flask.url_for('test_api_request'))
+
+@app.route('/gmail/revoke')
+def revoke():
+    if not os.path.exists('gmail/gmail_token.pickle'):
+        return ('You need to <a href="gmail/authorize">authorize</a> before testing the code to revoke credentials.')
+
+    with open('gmail/gmail_token.pickle', 'rb') as token:
+        creds = pickle.load(token)
+
+    revoke = requests.post('https://oauth2.googleapis.com/revoke',
+        params={'token': creds.token},
+        headers={'content-type': 'application/x-www-form-urlencoded'}
+    )
+
+    status_code = getattr(revoke, 'status_code')
+    if status_code == 200:
+        return('Credentials successfully revoked.' + print_index_table())
+    else:
+        return ('An error occurred.' + print_index_table())
+
+
+@app.route('/gmail/clear')
+def clear_credentials():
+    if os.path.exists('gmail/gmail_token.pickle'):
+        os.remove('gmail/gmail_token.pickle')
+    return ('Credentials have been cleared.<br><br>' + print_index_table())
+
+
+@app.route('/gmail/luminus_announcement', methods=['POST'])
 def luminus_announcement():
-    email_trigger = request.get_json()
-    print(parser.isoparse(email_trigger['message']['publish_time']), base64.b64decode(email_trigger['message']['data']))
-    return 'ok'
+    if client_ready:
+        history_list = gmail.users().history().list(userId='me', historyTypes=['messageAdded'], labelId='INBOX',
+                startHistoryId=history_id).execute()
+        if 'history' in history_list:
+            for history in history_list['history']:
+                if 'messagesAdded' in history:
+                    for added_message in history['messagesAdded']:
+                        id = added_message['message']['id']
+                        message = gmail.users().messages().get(userId='me', id=id, format='raw').execute()
+                        msg_bytes = base64.urlsafe_b64decode(message['raw'].encode('ASCII'))
+                        mime_msg = email.message_from_bytes(msg_bytes, policy = email.policy.default)
+
+                        if list(mime_msg.iter_attachments()).__len__() > 0:
+                            attachments = list(mime_msg.iter_attachments())
+                            for att in attachments:
+                                for part in att.walk():
+                                    if (part.get_content_type() == 'text/plain'):
+                                        print(part.get_content()[:100])
+
+        history_id = history_list['historyId']
+    else:
+        msg = f'Please authorize using Gmail account. {flask.url_for("authorize", _external=True)}'
+        bot.send_message(chatId=test_group_chat_id, text=msg)
+        return 'Client not ready'
+
+
+def print_index_table():
+  return ('<table>' +
+          '<tr><td><a href="gmail/test">Test an API request</a></td>' +
+          '<td>Submit an API request and see a formatted JSON response. ' +
+          '    Go through the authorization flow if there are no stored ' +
+          '    credentials for the user.</td></tr>' +
+          '<tr><td><a href="gmail/authorize">Test the auth flow directly</a></td>' +
+          '<td>Go directly to the authorization flow. If there are stored ' +
+          '    credentials, you still might not be prompted to reauthorize ' +
+          '    the application.</td></tr>' +
+          '<tr><td><a href="gmail/revoke">Revoke current credentials</a></td>' +
+          '<td>Revoke the access token associated with the current user ' +
+          '    session. After revoking credentials, if you go to the test ' +
+          '    page, you should see an <code>invalid_grant</code> error.' +
+          '</td></tr>' +
+          '<tr><td><a href="gmail/clear">Clear Flask session credentials</a></td>' +
+          '<td>Clear the access token currently stored in the user session. ' +
+          '    After clearing the token, if you <a href="gmail/test">test the ' +
+          '    API request</a> again, you should go back to the auth flow.' +
+          '</td></tr></table>')
 
 
 if __name__ == '__main__':
-    app.run(threaded=True)
+    # os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    app.run(threaded=True, debug=True)
