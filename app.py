@@ -283,7 +283,7 @@ def luminus_announcement():
                                     if 'From' in part:
                                         msg += f'Update from: {part.get("From")}\n'
                                         msg += f'Subject {part.get("Subject")}\n'
-                                        received_date = datetime.fromisoformat(part.get('Date'))
+                                        received_date = datetime.strptime(part.get('Date'), '%a, %d %b %Y %H:%M:%S %z')
                                         msg += received_date.strftime('%a, %d %b, %y %H:%M\n')
                                     if (part.get_content_type() == 'text/plain'):
                                         msg += trim_message(part.get_content()) + '--truncated'
