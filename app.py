@@ -279,6 +279,8 @@ def luminus_announcement():
                                 for part in att.walk():
                                     if 'From' in part:
                                         print(part.get('From'))
+                                        print(part.get('Subject'))
+                                        print(part.get('Date'))
                                     if (part.get_content_type() == 'text/plain'):
                                         print(shorten_message(part.get_content()))
 
