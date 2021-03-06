@@ -35,12 +35,12 @@ try:
                 creds.refresh(Request())
                 
     gmail = googleapiclient.discovery.build(API_SERVICE_NAME, API_VERSION, credentials=creds)
-    request = {
+    request_body = {
         'labelIds': ['INBOX'],
         'topicName': 'projects/thinking-banner-284203/topics/luminus-gmail-forward'
     }
     # save history_id returned by watch() call
-    history_id = gmail.users().watch(userId='me', body=request).execute()['historyId']
+    history_id = gmail.users().watch(userId='me', body=request_body).execute()['historyId']
 
     # save creds to pickle in case access token is refreshed
     with open('gmail/gmail_token.pickle', 'wb') as token:
@@ -209,7 +209,7 @@ def oauth2callback():
     # Specify the state when creating the flow in the callback so that it can
     # verify the authorization server response.
     state = flask.session['state']
-    authorization_response = request.url
+    authorization_response = flask.request.url
 
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
     flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
