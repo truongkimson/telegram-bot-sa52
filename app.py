@@ -296,7 +296,7 @@ def luminus_announcement():
         msg = f'Please authorize using Gmail account. {flask.url_for("authorize", _external=True)}'
         bot.send_message(chat_id=test_group_chat_id, text=msg)
         print(client_ready)
-        return 'Client not ready'
+        return flask.Response('Client unavailable', status=503)
 
 
 def print_index_table():
