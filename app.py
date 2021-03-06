@@ -274,7 +274,7 @@ def luminus_announcement():
         history_id = history_list['historyId']
     else:
         msg = f'Please authorize using Gmail account. {flask.url_for("authorize", _external=True)}'
-        bot.send_message(chatId=test_group_chat_id, text=msg)
+        bot.send_message(chat_id=test_group_chat_id, text=msg)
         return 'Client not ready'
 
 
