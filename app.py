@@ -14,6 +14,7 @@ from flask import Flask, request
 from requests.api import get
 from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id, test_group_chat_id
 from telebot import meme, stock
+from gmail.utils import shorten_message
 
 # Telegram bot token and create bot instance
 TOKEN = bot_token
@@ -271,13 +272,15 @@ def luminus_announcement():
                         message = gmail.users().messages().get(userId='me', id=id, format='raw').execute()
                         msg_bytes = base64.urlsafe_b64decode(message['raw'].encode('ASCII'))
                         mime_msg = email.message_from_bytes(msg_bytes, policy = email.policy.default)
-
+                        
                         if list(mime_msg.iter_attachments()).__len__() > 0:
                             attachments = list(mime_msg.iter_attachments())
                             for att in attachments:
                                 for part in att.walk():
+                                    if 'From' in part:
+                                        print(part.get('From'))
                                     if (part.get_content_type() == 'text/plain'):
-                                        print(part.get_content()[:100])
+                                        print(shorten_message(part.get_content()))
 
         history_id = history_list['historyId']
         return 'ok'
