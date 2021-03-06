@@ -24,6 +24,7 @@ CLIENT_SECRETS_FILE = 'gmail/client_id.json'
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 API_SERVICE_NAME = 'gmail'
 API_VERSION = 'v1'
+global history_id
 history_id = None
 
 try:
@@ -251,8 +252,8 @@ def clear_credentials():
 @app.route('/gmail/luminus_announcement', methods=['POST'])
 def luminus_announcement():
     if client_ready:
-        history_list = gmail.users().history().list(userId='me', historyTypes=['messageAdded'], labelId='INBOX',
-                startHistoryId=history_id).execute()
+        history_list = gmail.users().history().list(userId='me', historyTypes=['messageAdded'],
+            labelId='INBOX', startHistoryId=history_id).execute()
         if 'history' in history_list:
             for history in history_list['history']:
                 if 'messagesAdded' in history:
