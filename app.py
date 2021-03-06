@@ -227,7 +227,6 @@ def oauth2callback():
     with open('gmail/gmail_token.pickle', 'wb') as token:
         pickle.dump(creds, token)
     run_gmail_client()
-    print('Client ready.')
     
     return flask.redirect(flask.url_for('test_api_request'))
 
@@ -281,6 +280,7 @@ def luminus_announcement():
                                         print(part.get_content()[:100])
 
         history_id = history_list['historyId']
+        return 'ok'
     else:
         msg = f'Please authorize using Gmail account. {flask.url_for("authorize", _external=True)}'
         bot.send_message(chat_id=test_group_chat_id, text=msg)
