@@ -26,8 +26,10 @@ API_SERVICE_NAME = 'gmail'
 API_VERSION = 'v1'
 history_id = None
 client_ready = False
+gmail = None
 
-try:
+def run_gmail_client():
+    global client_ready, history_id, gmail
     with open('gmail/gmail_token.pickle', 'rb') as token:
         creds = pickle.load(token)
         if not creds.valid:
@@ -47,6 +49,9 @@ try:
         pickle.dump(creds, token)
     client_ready = True
     print(f'Gmail client is ready. HistoryId={history_id}')
+
+try:
+    run_gmail_client()
 except Exception as e:
     print(f'Gmail client not instantiated. Error occured: {e}')
     client_ready = False
@@ -221,7 +226,7 @@ def oauth2callback():
     creds = flow.credentials
     with open('gmail/gmail_token.pickle', 'wb') as token:
         pickle.dump(creds, token)
-    client_ready = True
+    run_gmail_client()
     print('Client ready.')
     
     return flask.redirect(flask.url_for('test_api_request'))
@@ -303,6 +308,8 @@ def print_index_table():
           f'    After clearing the token, if you <a href="{flask.url_for("test_api_request")}">test the ' +
           '    API request</a> again, you should go back to the auth flow.' +
           '</td></tr></table>')
+
+
 
 
 if __name__ == '__main__':
