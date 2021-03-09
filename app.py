@@ -319,6 +319,8 @@ def print_index_table():
             '    session. After revoking credentials, if you go to the test ' +
             '    page, you should see an <code>invalid_grant</code> error.' +
             '</td></tr>' +
+            f'<tr><td><a href="{flask.url_for("call_watch")}">Call watch() method on gmail client</a></td>' +
+            '<td>Call watch() and get HistoryId</td></tr>' +
             f'<tr><td><a href="{flask.url_for("clear_credentials")}">Clear Flask session credentials</a></td>' +
             '<td>Clear the access token currently stored in the user session. ' +
             f'    After clearing the token, if you <a href="{flask.url_for("test_api_request")}">test the ' +
