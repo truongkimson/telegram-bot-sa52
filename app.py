@@ -264,6 +264,7 @@ def luminus_announcement():
     global history_id, gmail
     msg = ''
 
+    print(f'Client status: {gmail}, HistoryId: {history_id}')
     if gmail:
         history_list = gmail.users().history().list(userId='me', historyTypes=['messageAdded'],
                                                     labelId='INBOX', startHistoryId=history_id).execute()
