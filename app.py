@@ -159,6 +159,7 @@ def gmail_index():
 
 @app.route('/gmail/call_watch')
 def call_watch():
+    global gmail
     creds = get_creds_from_db()
     gmail = googleapiclient.discovery.build(
         API_SERVICE_NAME, API_VERSION, credentials=creds)
