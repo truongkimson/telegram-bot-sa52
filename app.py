@@ -273,8 +273,8 @@ def luminus_announcement():
     history_id = get_history_id_from_db()
     if not creds:
         print('Pickle not found in db')
-        msg = f'Please authorize using Gmail account. {flask.url_for("authorize", next="test_api_request", _external=True)}'
-        bot.send_message(chat_id=test_group_chat_id, text=msg)
+        msg = f'Pickle not found in db. {flask.url_for("authorize", next="test_api_request", _external=True)}'
+        bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
         return 'Client unavailable'
 
     # load pickle into creds, check if still valid
@@ -282,9 +282,9 @@ def luminus_announcement():
         if creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            print('Unable to refresh token')
-            msg = f'Please authorize using Gmail account. {flask.url_for("authorize", next="test_api_request", _external=True)}'
-            bot.send_message(chat_id=test_group_chat_id, text=msg)
+            print(f'Credential invalid. Expired: {creds.expired}, Refresh token: {creds.referesh}')
+            msg = f'Credential invalid. Expired: {creds.expired}, Refresh token: {creds.referesh}. {flask.url_for("authorize", next="test_api_request", _external=True)}'
+            bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
             return 'Client unavailable'
 
     gmail = googleapiclient.discovery.build(
@@ -320,8 +320,8 @@ def luminus_announcement():
                             print(msg)
                             bot.send_message(
                                 chat_id=test_group_chat_id, text=msg)
-                            bot.send_message(
-                                chat_id=servant_group_chat_id, text=msg)
+                            # bot.send_message(
+                            #     chat_id=servant_group_chat_id, text=msg)
     if msg == '':
         print('Non-MessageAdded webhook')
     history_id = history_list['historyId']
@@ -362,14 +362,14 @@ def run_gmail_client_and_watch():
                     creds.refresh(Request())
                 except Exception as e:
                     print(e)
-                    msg = 'Please authorize using Gmail account. https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch'
-                    bot.send_message(chat_id=test_group_chat_id, text=msg)
+                    msg = f'{e}. https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch'
+                    bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
                     return False
 
             else:
-                print('Refresh token missing')
-                msg = 'Please authorize using Gmail account. https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch'
-                bot.send_message(chat_id=test_group_chat_id, text=msg)
+                print(f'Credential invalid. Expired: {creds.expired}, Refresh token: {creds.referesh}')
+                msg = f'Credential invalid. Expired: {creds.expired}, Refresh token: {creds.referesh}. https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch'
+                bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
                 return False
 
         gmail = googleapiclient.discovery.build(
@@ -390,8 +390,8 @@ def run_gmail_client_and_watch():
         return True
     else:
         print('Token not found in DB.')
-        msg = 'Please authorize using Gmail account. https://polar-ridge-56723.herokuapp.com/gmail'
-        bot.send_message(chat_id=test_group_chat_id, text=msg)
+        msg = 'Token not found in DB. https://polar-ridge-56723.herokuapp.com/gmail'
+        bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
         return False
 
 
