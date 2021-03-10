@@ -11,7 +11,7 @@ from datetime import datetime
 from google.auth.transport.requests import Request
 from werkzeug.utils import redirect
 from flask import Flask, request
-from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id, test_group_chat_id
+from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id, test_group_chat_id, servant_group_chat_id
 from telebot import meme, stock
 from gmail.utils import trim_message
 from db.db_access import (get_creds_from_db,
@@ -311,6 +311,8 @@ def luminus_announcement():
                             print(msg)
                             bot.send_message(
                                 chat_id=test_group_chat_id, text=msg)
+                            bot.send_message(
+                                chat_id=servant_group_chat_id, text=msg)
     history_id = history_list['historyId']
     save_history_id_to_db(history_id)
     return 'ok'

@@ -2,6 +2,7 @@ import re
 import os
 
 def trim_message(msg):
+    msg = msg.strip()
     msg = re.sub(r'\n\s+', '\n', msg)
     return msg
 
