@@ -69,7 +69,7 @@ def save_history_id_to_db(history_id):
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cur = conn.cursor()
     ts = datetime.now(tz=gettz('Asia/Singapore'))
-    cur.execute("INSERT INTO history VALUES (%s, %s);", (history_id, ts))
+    cur.execute("INSERT INTO history (history_id, tstamp) VALUES (%s, %s);", (history_id, ts))
     conn.commit()
     cur.close()
     conn.close()
