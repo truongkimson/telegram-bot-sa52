@@ -308,9 +308,9 @@ def luminus_announcement():
                                 if (part.get_content_type() == 'text/plain'):
                                     msg += trim_message(part.get_content())
                                     msg = msg[:200] + ' --truncated'
-                                    print(msg)
-                                    bot.send_message(
-                                        chat_id=test_group_chat_id, text=msg)
+                            print(msg)
+                            bot.send_message(
+                                chat_id=test_group_chat_id, text=msg)
     history_id = history_list['historyId']
     save_history_id_to_db(history_id)
     return 'ok'
