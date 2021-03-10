@@ -3,9 +3,7 @@ import telegram
 import requests
 import email
 import base64
-import pickle
 import flask
-import psycopg2
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 from dateutil.tz import gettz
@@ -16,6 +14,11 @@ from flask import Flask, request
 from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id, test_group_chat_id
 from telebot import meme, stock
 from gmail.utils import trim_message
+from db.db_access import (get_creds_from_db,
+                          save_creds_to_db,
+                          delete_creds_from_db,
+                          get_history_id_from_db,
+                          save_history_id_to_db)
 
 # Telegram bot token and create bot instance
 TOKEN = bot_token
@@ -26,8 +29,6 @@ CLIENT_SECRETS_FILE = 'gmail/client_id.json'
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 API_SERVICE_NAME = 'gmail'
 API_VERSION = 'v1'
-history_id = None
-gmail = None
 
 # PostgresDB connection on heroku server
 DATABASE_URL = os.environ['DATABASE_URL']
@@ -149,8 +150,6 @@ def set_webhook():
     else:
         return "webhook set unsuccessfully"
 
-# gmail API
-
 
 @app.route('/gmail')
 def gmail_index():
@@ -159,7 +158,6 @@ def gmail_index():
 
 @app.route('/gmail/call_watch')
 def call_watch():
-    global history_id, gmail
     creds = get_creds_from_db()
     gmail = googleapiclient.discovery.build(
         API_SERVICE_NAME, API_VERSION, credentials=creds)
@@ -171,6 +169,7 @@ def call_watch():
     # save global history_id returned by watch() call
     history_id = gmail.users().watch(
         userId='me', body=request_body).execute()['historyId']
+    save_history_id_to_db(history_id)
     return f'HistoryId = {history_id}'
 
 
@@ -261,49 +260,60 @@ def clear_credentials():
 
 @app.route('/gmail/luminus_announcement', methods=['POST'])
 def luminus_announcement():
-    global history_id, gmail
     msg = ''
 
-    print(f'Client status: {gmail}, HistoryId: {history_id}')
-    if gmail:
-        history_list = gmail.users().history().list(userId='me', historyTypes=['messageAdded'],
-                                                    labelId='INBOX', startHistoryId=history_id).execute()
-        if 'history' in history_list:
-            for history in history_list['history']:
-                if 'messagesAdded' in history:
-                    for added_message in history['messagesAdded']:
-                        id = added_message['message']['id']
-                        message = gmail.users().messages().get(
-                            userId='me', id=id, format='raw').execute()
-                        msg_bytes = base64.urlsafe_b64decode(
-                            message['raw'].encode('ASCII'))
-                        mime_msg = email.message_from_bytes(
-                            msg_bytes, policy=email.policy.default)
-
-                        if list(mime_msg.iter_attachments()).__len__() > 0:
-                            attachments = list(mime_msg.iter_attachments())
-                            for att in attachments:
-                                for part in att.walk():
-                                    if 'From' in part:
-                                        msg += f'Update from: {part.get("From")}\n'
-                                        received_date = datetime.strptime(part.get('Date'), '%a, %d %b %Y %H:%M:%S %z')\
-                                            .astimezone(tz=gettz('Asia/Singapore'))
-                                        msg += received_date.strftime(
-                                            '%H:%M %a, %d %b, %Y \n')
-                                        msg += f'Subject: {part.get("Subject")}\n\n'
-                                    if (part.get_content_type() == 'text/plain'):
-                                        msg += trim_message(part.get_content())
-                                        msg = msg[:200] + ' --truncated'
-                                        print(msg)
-                                        bot.send_message(
-                                            chat_id=test_group_chat_id, text=msg)
-        history_id = history_list['historyId']
-        return 'ok'
-
-    else:
+    creds = get_creds_from_db()
+    history_id = get_history_id_from_db()
+    if not creds:
         msg = f'Please authorize using Gmail account. {flask.url_for("authorize", _external=True)}'
         bot.send_message(chat_id=test_group_chat_id, text=msg)
         return 'Client unavailable'
+
+    # load pickle into creds, check if still valid
+    if not creds.valid:
+        if creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            msg = f'Please authorize using Gmail account. {flask.url_for("authorize", _external=True)}'
+            bot.send_message(chat_id=test_group_chat_id, text=msg)
+            return 'Client unavailable'
+
+    gmail = googleapiclient.discovery.build(
+        API_SERVICE_NAME, API_VERSION, credentials=creds)
+    history_list = gmail.users().history().list(userId='me', historyTypes=['messageAdded'],
+                                                labelId='INBOX', startHistoryId=history_id).execute()
+    if 'history' in history_list:
+        for history in history_list['history']:
+            if 'messagesAdded' in history:
+                for added_message in history['messagesAdded']:
+                    id = added_message['message']['id']
+                    message = gmail.users().messages().get(
+                        userId='me', id=id, format='raw').execute()
+                    msg_bytes = base64.urlsafe_b64decode(
+                        message['raw'].encode('ASCII'))
+                    mime_msg = email.message_from_bytes(
+                        msg_bytes, policy=email.policy.default)
+
+                    if list(mime_msg.iter_attachments()).__len__() > 0:
+                        attachments = list(mime_msg.iter_attachments())
+                        for att in attachments:
+                            for part in att.walk():
+                                if 'From' in part:
+                                    msg += f'Update from: {part.get("From")}\n'
+                                    received_date = datetime.strptime(part.get('Date'), '%a, %d %b %Y %H:%M:%S %z')\
+                                        .astimezone(tz=gettz('Asia/Singapore'))
+                                    msg += received_date.strftime(
+                                        '%H:%M %a, %d %b, %Y \n')
+                                    msg += f'Subject: {part.get("Subject")}\n\n'
+                                if (part.get_content_type() == 'text/plain'):
+                                    msg += trim_message(part.get_content())
+                                    msg = msg[:200] + ' --truncated'
+                                    print(msg)
+                                    bot.send_message(
+                                        chat_id=test_group_chat_id, text=msg)
+    history_id = history_list['historyId']
+    save_history_id_to_db(history_id)
+    return 'ok'
 
 
 def print_index_table():
@@ -330,56 +340,7 @@ def print_index_table():
             '</td></tr></table>')
 
 
-def get_creds_from_db():
-    # PostgresDB localhost
-    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT pickle FROM gmail WHERE name = 'rtcbcotprinter@gmail.com';")
-    result = cur.fetchone()
-    if result:
-        result = pickle.loads(result[0])
-    cur.close()
-    conn.close()
-    return result
-
-
-def save_creds_to_db(creds):
-    pickle_byte = pickle.dumps(creds)
-    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT EXISTS(SELECT pickle FROM gmail WHERE name = 'rtcbcotprinter@gmail.com');")
-    if cur.fetchone()[0]:
-        cur.execute("UPDATE gmail SET pickle = %s;", (pickle_byte,))
-    else:
-        cur.execute("INSERT INTO gmail (name, pickle) VALUES (%s, %s);",
-                    ('rtcbcotprinter@gmail.com', pickle_byte))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return True
-
-
-def delete_creds_from_db():
-    result = False
-    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT EXISTS(SELECT pickle FROM gmail WHERE name = 'rtcbcotprinter@gmail.com');")
-    if cur.fetchone()[0]:
-        cur.execute(
-            "DELETE FROM gmail WHERE name = 'rtcbcotprinter@gmail.com';")
-        result = True
-    conn.commit()
-    cur.close()
-    conn.close()
-    return result
-
-
 def run_gmail_client_and_watch():
-    global history_id
-
     creds = get_creds_from_db()
     if creds:
         if not creds.valid:
@@ -411,6 +372,7 @@ def run_gmail_client_and_watch():
 
         # save creds to pickle in case access token is refreshed
         save_creds_to_db(creds)
+        save_history_id_to_db(history_id)
         print(f'Gmail client is ready. HistoryId={history_id}')
         return True
     else:
@@ -420,11 +382,11 @@ def run_gmail_client_and_watch():
         return False
 
 
+if not run_gmail_client_and_watch():
+    print('Gmail client not instantiated.')
+
+
 if __name__ == '__main__':
-    if run_gmail_client_and_watch():
-        print(f'Client ready. HistoryId = {history_id}')
-    else:
-        print('Gmail client not instantiated.')
 
     # os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     # app.run('localhost', 8080, threaded=True, debug=True)
