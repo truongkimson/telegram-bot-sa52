@@ -265,6 +265,7 @@ def luminus_announcement():
     creds = get_creds_from_db()
     history_id = get_history_id_from_db()
     if not creds:
+        print('Pickle not found in db')
         msg = f'Please authorize using Gmail account. {flask.url_for("authorize", _external=True)}'
         bot.send_message(chat_id=test_group_chat_id, text=msg)
         return 'Client unavailable'
@@ -274,6 +275,7 @@ def luminus_announcement():
         if creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
+            print('Unable to refresh token')
             msg = f'Please authorize using Gmail account. {flask.url_for("authorize", _external=True)}'
             bot.send_message(chat_id=test_group_chat_id, text=msg)
             return 'Client unavailable'
