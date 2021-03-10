@@ -201,19 +201,24 @@ def test_api_request():
 
 @app.route('/gmail/authorize')
 def authorize():
+    # get next variable from request query
+    next = request.args.get('next') if next else 'gmail_index'
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE, scopes=SCOPES)
-    flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
+
+    flow.redirect_uri = flask.url_for('oauth2callback', next=next, _external=True)
 
     authorization_url, state = flow.authorization_url(access_type='offline')
     # Store state so the callback can verify the auth server response.
     flask.session['state'] = state
-
+    
     return redirect(authorization_url)
 
 
 @app.route('/gmail/oauth2callback')
 def oauth2callback():
+    # get next variable from request query
+    next = request.args.get('next')
     # Specify the state when creating the flow in the callback so that it can
     # verify the authorization server response.
     state = flask.session['state']
@@ -228,7 +233,7 @@ def oauth2callback():
     creds = flow.credentials
     save_creds_to_db(creds)
 
-    return flask.redirect(flask.url_for('gmail_index'))
+    return flask.redirect(flask.url_for(next))
 
 
 @app.route('/gmail/revoke')
@@ -266,7 +271,7 @@ def luminus_announcement():
     history_id = get_history_id_from_db()
     if not creds:
         print('Pickle not found in db')
-        msg = f'Please authorize using Gmail account. {flask.url_for("authorize", _external=True)}'
+        msg = f'Please authorize using Gmail account. {flask.url_for("authorize", next="test_api_request", _external=True)}'
         bot.send_message(chat_id=test_group_chat_id, text=msg)
         return 'Client unavailable'
 
@@ -276,7 +281,7 @@ def luminus_announcement():
             creds.refresh(Request())
         else:
             print('Unable to refresh token')
-            msg = f'Please authorize using Gmail account. {flask.url_for("authorize", _external=True)}'
+            msg = f'Please authorize using Gmail account. {flask.url_for("authorize", next="test_api_request", _external=True)}'
             bot.send_message(chat_id=test_group_chat_id, text=msg)
             return 'Client unavailable'
 
@@ -315,6 +320,8 @@ def luminus_announcement():
                                 chat_id=test_group_chat_id, text=msg)
                             bot.send_message(
                                 chat_id=servant_group_chat_id, text=msg)
+    if msg == '':
+        print('Non-MessageAdded webhook')
     history_id = history_list['historyId']
     save_history_id_to_db(history_id)
     return 'ok'
@@ -353,13 +360,13 @@ def run_gmail_client_and_watch():
                     creds.refresh(Request())
                 except Exception as e:
                     print(e)
-                    msg = 'Please authorize using Gmail account. https://polar-ridge-56723.herokuapp.com/gmail'
+                    msg = 'Please authorize using Gmail account. https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch'
                     bot.send_message(chat_id=test_group_chat_id, text=msg)
                     return False
 
             else:
                 print('Refresh token missing')
-                msg = 'Please authorize using Gmail account. https://polar-ridge-56723.herokuapp.com/gmail'
+                msg = 'Please authorize using Gmail account. https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch'
                 bot.send_message(chat_id=test_group_chat_id, text=msg)
                 return False
 
