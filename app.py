@@ -202,7 +202,9 @@ def test_api_request():
 @app.route('/gmail/authorize')
 def authorize():
     # get next variable from request query
-    next = request.args.get('next') if next else 'gmail_index'
+    next = request.args.get('next')
+    if not next:
+        next = 'gmail_index'
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE, scopes=SCOPES)
 
