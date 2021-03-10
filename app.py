@@ -225,7 +225,7 @@ def oauth2callback():
     # verify the authorization server response.
     state = flask.session['state']
     authorization_response = flask.request.url
-
+    print(authorization_response)
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
     flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
