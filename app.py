@@ -29,7 +29,7 @@ handler.add_command('/start', start_command)
 handler.add_command('/help', help_command)
 handler.add_command('/hello', hello_command)
 handler.add_command('/punish', punish_command)
-handler.add_command('/punishhard', punish_hard_command)
+handler.add_command('/hardpunish', punish_hard_command)
 handler.add_command('/meme', meme_command)
 handler.add_command('/stock', stock_command)
 
