@@ -1,3 +1,11 @@
+from db_lib.db_access import (get_creds_from_db,
+                              save_creds_to_db,
+                              delete_creds_from_db,
+                              get_history_id_from_db,
+                              save_history_id_to_db)
+from google.auth.exceptions import GoogleAuthError
+from gmail.utils import trim_message
+from telebot import meme, stock
 import os
 import telegram
 import requests
@@ -11,16 +19,7 @@ from datetime import datetime
 from google.auth.transport.requests import Request
 from werkzeug.utils import redirect
 from flask import Flask, request
-from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id, test_group_chat_id, servant_group_chat_id,
-                                guys_group_chat_id
-from telebot import meme, stock
-from gmail.utils import trim_message
-from google.auth.exceptions import GoogleAuthError
-from db_lib.db_access import (get_creds_from_db,
-                          save_creds_to_db,
-                          delete_creds_from_db,
-                          get_history_id_from_db,
-                          save_history_id_to_db)
+from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id, test_group_chat_id, servant_group_chat_id, guys_group_chat_id
 
 # Telegram bot token and create bot instance
 TOKEN = bot_token
@@ -172,7 +171,8 @@ def call_watch():
     history_id = gmail.users().watch(
         userId='me', body=request_body).execute()['historyId']
     save_history_id_to_db(history_id)
-    print(f'Expiry: {creds.expiry}, Refresh token: {creds.refresh_token}, Expired: {creds.expired}')
+    print(
+        f'Expiry: {creds.expiry}, Refresh token: {creds.refresh_token}, Expired: {creds.expired}')
     return f'HistoryId = {history_id}'
 
 
@@ -202,7 +202,8 @@ def test_api_request():
 
     # save creds to pickle in case access token is refreshed
     save_creds_to_db(creds)
-    print(f'Expiry: {creds.expiry}, Refresh token: {creds.refresh_token}, Expired: {creds.expired}')
+    print(
+        f'Expiry: {creds.expiry}, Refresh token: {creds.refresh_token}, Expired: {creds.expired}')
     return flask.jsonify(msg_list)
 
 
@@ -215,12 +216,13 @@ def authorize():
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE, scopes=SCOPES)
 
-    flow.redirect_uri = flask.url_for('oauth2callback', next=next, _external=True)
+    flow.redirect_uri = flask.url_for(
+        'oauth2callback', next=next, _external=True)
 
     authorization_url, state = flow.authorization_url(access_type='offline')
     # Store state so the callback can verify the auth server response.
     flask.session['state'] = state
-    
+
     return redirect(authorization_url)
 
 
@@ -235,13 +237,15 @@ def oauth2callback():
 
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
-    flow.redirect_uri = flask.url_for('oauth2callback', next=next, _external=True)
+    flow.redirect_uri = flask.url_for(
+        'oauth2callback', next=next, _external=True)
     # state is used to verify reponse here
     flow.fetch_token(authorization_response=authorization_response)
 
     creds = flow.credentials
     save_creds_to_db(creds)
-    print(f'Expiry: {creds.expiry}, Refresh token: {creds.refresh_token}, Expired: {creds.expired}')
+    print(
+        f'Expiry: {creds.expiry}, Refresh token: {creds.refresh_token}, Expired: {creds.expired}')
     return flask.redirect(flask.url_for(next))
 
 
@@ -281,7 +285,8 @@ def luminus_announcement():
     if not creds:
         print('Pickle not found in db')
         msg = f'Pickle not found in db. {flask.url_for("authorize", next="test_api_request", _external=True)}'
-        bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
+        bot.send_message(chat_id=test_group_chat_id, text=msg,
+                         disable_web_page_preview=True)
         return 'Client unavailable'
 
     # load pickle into creds, check if still valid
@@ -291,15 +296,19 @@ def luminus_announcement():
                 creds.refresh(Request())
             except GoogleAuthError as e:
                 print(f'An error occured: {e}')
-                print(f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
+                print(
+                    f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
                 msg = f'An error occured: {e}. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}. {flask.url_for("authorize", next="test_api_request", _external=True)}'
-                bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
+                bot.send_message(chat_id=test_group_chat_id,
+                                 text=msg, disable_web_page_preview=True)
                 return 'Refresh error'
 
         else:
-            print(f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
+            print(
+                f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
             msg = f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}. {flask.url_for("authorize", next="test_api_request", _external=True)}'
-            bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
+            bot.send_message(chat_id=test_group_chat_id,
+                             text=msg, disable_web_page_preview=True)
             return 'Client unavailable'
 
     gmail = googleapiclient.discovery.build(
@@ -336,7 +345,7 @@ def luminus_announcement():
                             bot.send_message(
                                 chat_id=test_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=False)
                             bot.send_message(
-                                chat_id=guys_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=False)    
+                                chat_id=guys_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=False)
                             # bot.send_message(
                             #     chat_id=servant_group_chat_id, text=msg)
     if msg == '':
@@ -344,7 +353,8 @@ def luminus_announcement():
     history_id = history_list['historyId']
     save_history_id_to_db(history_id)
     save_creds_to_db(creds)
-    print(f'Expiry: {creds.expiry}, Refresh token: {creds.refresh_token}, Expired: {creds.expired}')
+    print(
+        f'Expiry: {creds.expiry}, Refresh token: {creds.refresh_token}, Expired: {creds.expired}')
     return 'ok'
 
 
@@ -380,15 +390,19 @@ def run_gmail_client_and_watch():
                 try:
                     creds.refresh(Request())
                 except GoogleAuthError as e:
-                    print(f'{e}. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
+                    print(
+                        f'{e}. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
                     msg = f'{e}. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}. https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch'
-                    bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
+                    bot.send_message(chat_id=test_group_chat_id,
+                                     text=msg, disable_web_page_preview=True)
                     return False
 
             else:
-                print(f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
+                print(
+                    f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
                 msg = f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}. https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch'
-                bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
+                bot.send_message(chat_id=test_group_chat_id,
+                                 text=msg, disable_web_page_preview=True)
                 return False
 
         gmail = googleapiclient.discovery.build(
@@ -405,13 +419,15 @@ def run_gmail_client_and_watch():
         # save creds to pickle in case access token is refreshed
         save_creds_to_db(creds)
         save_history_id_to_db(history_id)
-        print(f'Expiry: {creds.expiry}, Refresh token: {creds.refresh_token}, Expired: {creds.expired}')
+        print(
+            f'Expiry: {creds.expiry}, Refresh token: {creds.refresh_token}, Expired: {creds.expired}')
         print(f'Gmail client is ready. HistoryId={history_id}')
         return True
     else:
         print('Token not found in DB.')
         msg = 'Token not found in DB. https://polar-ridge-56723.herokuapp.com/gmail'
-        bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
+        bot.send_message(chat_id=test_group_chat_id, text=msg,
+                         disable_web_page_preview=True)
         return False
 
 

@@ -27,7 +27,7 @@ def get_creds_from_db():
 def save_creds_to_db(creds):
     pickle_byte = pickle.dumps(creds)
     # conn = psycopg2.connect(host=DB_HOST, dbname=DB_NAME,
-    #                         user=DB_USERNAME, password=DB_PASSWORD)    
+    #                         user=DB_USERNAME, password=DB_PASSWORD)
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cur = conn.cursor()
     cur.execute(
