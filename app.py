@@ -4,7 +4,7 @@ from db_lib.db_access import (get_creds_from_db,
                               get_history_id_from_db,
                               save_history_id_to_db)
 from google.auth.exceptions import GoogleAuthError
-from gmail.utils import trim_message
+from gmail.utils import trim_text
 from telebot import meme, stock
 import os
 import re
@@ -333,14 +333,14 @@ def luminus_announcement():
                         for att in attachments:
                             for part in att.walk():
                                 if 'From' in part:
-                                    msg += f'&lt&ltUpdate&gt&gt\n<b>From:</b> {part.get("From")}\n'
+                                    msg += f'&lt&ltUpdate&gt&gt\n<b>From:</b> {trim_text(part.get("From"))}\n'
                                     received_date = datetime.strptime(part.get('Date'), '%a, %d %b %Y %H:%M:%S %z')\
                                         .astimezone(tz=gettz('Asia/Singapore'))
                                     msg += received_date.strftime(
                                         '%H:%M %a, %d %b, %Y \n')
-                                    msg += f'<b>Subject:</b> {part.get("Subject")}\n\n'
+                                    msg += f'<b>Subject:</b> {trim_text(part.get("Subject"))}\n\n'
                                 if (part.get_content_type() == 'text/plain'):
-                                    msg += trim_message(part.get_content())
+                                    msg += trim_text(part.get_content())
 
                             print(msg)
                             bot.send_message(
