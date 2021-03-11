@@ -5,7 +5,7 @@ import html
 
 def trim_text(msg):
     msg = msg.strip()
-    msg = re.sub(r'\n\s+', '\n', msg)[:400] + ' --truncated'
+    msg = re.sub(r'\n\s+', '\n', msg)
     msg = html.escape(msg)
     return msg
 

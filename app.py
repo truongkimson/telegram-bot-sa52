@@ -333,22 +333,22 @@ def luminus_announcement():
                         for att in attachments:
                             for part in att.walk():
                                 if 'From' in part:
-                                    msg += f'&lt&ltUpdate&gt&gt\n<b>From:</b> {trim_text(part.get("From"))}\n'
+                                    msg += f'&lt;&lt;Update&gt;&gt;\n<b>From:</b> {trim_text(part.get("From"))}\n'
                                     received_date = datetime.strptime(part.get('Date'), '%a, %d %b %Y %H:%M:%S %z')\
                                         .astimezone(tz=gettz('Asia/Singapore'))
                                     msg += received_date.strftime(
                                         '%H:%M %a, %d %b, %Y \n')
                                     msg += f'<b>Subject:</b> {trim_text(part.get("Subject"))}\n\n'
                                 if (part.get_content_type() == 'text/plain'):
-                                    msg += trim_text(part.get_content())
+                                    msg += trim_text(part.get_content())[:400] + ' --truncated'
 
                             print(msg)
                             bot.send_message(
-                                chat_id=test_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=False)
-                            bot.send_message(
-                                chat_id=guys_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=False)
+                                chat_id=test_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
                             # bot.send_message(
-                            #     chat_id=servant_group_chat_id, text=msg)
+                            #     chat_id=guys_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
+                            # bot.send_message(
+                            #     chat_id=servant_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
     if msg == '':
         print('Non-MessageAdded webhook')
     history_id = history_list['historyId']
