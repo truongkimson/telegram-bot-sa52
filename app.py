@@ -7,6 +7,7 @@ from google.auth.exceptions import GoogleAuthError
 from gmail.utils import trim_message
 from telebot import meme, stock
 import os
+import re
 import telegram
 import requests
 import email
@@ -332,7 +333,7 @@ def luminus_announcement():
                         for att in attachments:
                             for part in att.walk():
                                 if 'From' in part:
-                                    msg += f'==Update==\n<b>From:</b> {part.get("From")}\n'
+                                    msg += f'&lt&ltUpdate&gt&gt\n<b>From:</b> {part.get("From")}\n'
                                     received_date = datetime.strptime(part.get('Date'), '%a, %d %b %Y %H:%M:%S %z')\
                                         .astimezone(tz=gettz('Asia/Singapore'))
                                     msg += received_date.strftime(
@@ -340,7 +341,7 @@ def luminus_announcement():
                                     msg += f'<b>Subject:</b> {part.get("Subject")}\n\n'
                                 if (part.get_content_type() == 'text/plain'):
                                     msg += trim_message(part.get_content())
-                                    msg = msg[:400] + ' --truncated'
+
                             print(msg)
                             bot.send_message(
                                 chat_id=test_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=False)
