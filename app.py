@@ -195,7 +195,7 @@ def test_api_request():
 
     # save creds to pickle in case access token is refreshed
     save_creds_to_db(creds)
-
+    print(f'Expiry: {creds.expiry}, Refresh token: {creds.refresh_token}, Expired: {creds.expired}')
     return flask.jsonify(msg_list)
 
 
@@ -234,7 +234,7 @@ def oauth2callback():
 
     creds = flow.credentials
     save_creds_to_db(creds)
-
+    print(f'Expiry: {creds.expiry}, Refresh token: {creds.refresh_token}, Expired: {creds.expired}')
     return flask.redirect(flask.url_for(next))
 
 
@@ -282,8 +282,8 @@ def luminus_announcement():
         if creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            print(f'Credential invalid. Expired: {creds.expired}, Refresh token: {creds.referesh}')
-            msg = f'Credential invalid. Expired: {creds.expired}, Refresh token: {creds.referesh}. {flask.url_for("authorize", next="test_api_request", _external=True)}'
+            print(f'Credential invalid. Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
+            msg = f'Credential invalid. Expired: {creds.expired}, Refresh token: {creds.refresh_token}. {flask.url_for("authorize", next="test_api_request", _external=True)}'
             bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
             return 'Client unavailable'
 
@@ -386,6 +386,7 @@ def run_gmail_client_and_watch():
         # save creds to pickle in case access token is refreshed
         save_creds_to_db(creds)
         save_history_id_to_db(history_id)
+        print(f'Expiry: {creds.expiry}, Refresh token: {creds.refresh_token}, Expired: {creds.expired}')
         print(f'Gmail client is ready. HistoryId={history_id}')
         return True
     else:
@@ -400,7 +401,6 @@ if not run_gmail_client_and_watch():
 
 
 if __name__ == '__main__':
-
-    # os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-    # app.run('localhost', 8080, threaded=True, debug=True)
-    app.run(threaded=True)
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    app.run('localhost', 8080, threaded=True, debug=True)
+    # app.run(threaded=True)
