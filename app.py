@@ -332,7 +332,7 @@ def luminus_announcement():
                         for att in attachments:
                             for part in att.walk():
                                 if 'From' in part:
-                                    msg += f'<<Update>>\n<b>From:</b> {part.get("From")}\n'
+                                    msg += f'==Update==\n<b>From:</b> {part.get("From")}\n'
                                     received_date = datetime.strptime(part.get('Date'), '%a, %d %b %Y %H:%M:%S %z')\
                                         .astimezone(tz=gettz('Asia/Singapore'))
                                     msg += received_date.strftime(
