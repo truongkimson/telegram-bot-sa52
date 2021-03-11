@@ -11,7 +11,8 @@ from datetime import datetime
 from google.auth.transport.requests import Request
 from werkzeug.utils import redirect
 from flask import Flask, request
-from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id, test_group_chat_id, servant_group_chat_id
+from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id, test_group_chat_id, servant_group_chat_id,
+                                guys_group_chat_id
 from telebot import meme, stock
 from gmail.utils import trim_message
 from google.auth.exceptions import GoogleAuthError
@@ -333,7 +334,9 @@ def luminus_announcement():
                                     msg = msg[:400] + ' --truncated'
                             print(msg)
                             bot.send_message(
-                                chat_id=test_group_chat_id, text=msg, parse_mode='HTML')
+                                chat_id=test_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=False)
+                            bot.send_message(
+                                chat_id=guys_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=False)    
                             # bot.send_message(
                             #     chat_id=servant_group_chat_id, text=msg)
     if msg == '':
