@@ -16,9 +16,12 @@ class Command_handler():
         chat_id = update_message.chat.id
         msg_id = update_message.message_id
         text = update_message.text.encode('utf-8').decode()
+        print(text)
         for command in self.commands:
             if text.startswith(command) or text.startswith(f'{command}@{bot_user_name}'):
+                print(f'Matched {command}')
                 return self.commands[command](bot, update_message, chat_id, msg_id)
+        print('No matched commands')
         return
 
     def add_command(self, command_text, callback):
