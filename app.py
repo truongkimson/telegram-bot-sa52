@@ -322,18 +322,18 @@ def luminus_announcement():
                         for att in attachments:
                             for part in att.walk():
                                 if 'From' in part:
-                                    msg += f'Update from: {part.get("From")}\n'
+                                    msg += f'<<Update>>\n<b>From:</b> {part.get("From")}\n'
                                     received_date = datetime.strptime(part.get('Date'), '%a, %d %b %Y %H:%M:%S %z')\
                                         .astimezone(tz=gettz('Asia/Singapore'))
                                     msg += received_date.strftime(
                                         '%H:%M %a, %d %b, %Y \n')
-                                    msg += f'Subject: {part.get("Subject")}\n\n'
+                                    msg += f'<b>Subject:</b> {part.get("Subject")}\n\n'
                                 if (part.get_content_type() == 'text/plain'):
                                     msg += trim_message(part.get_content())
                                     msg = msg[:400] + ' --truncated'
                             print(msg)
                             bot.send_message(
-                                chat_id=test_group_chat_id, text=msg)
+                                chat_id=test_group_chat_id, text=msg, parse_mode='HTML')
                             # bot.send_message(
                             #     chat_id=servant_group_chat_id, text=msg)
     if msg == '':
@@ -377,8 +377,8 @@ def run_gmail_client_and_watch():
                 try:
                     creds.refresh(Request())
                 except GoogleAuthError as e:
-                    print(e)
-                    msg = f'{e}. https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch'
+                    print(f'{e}. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
+                    msg = f'{e}. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}. https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch'
                     bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
                     return False
 
