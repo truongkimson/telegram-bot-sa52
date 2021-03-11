@@ -367,8 +367,8 @@ def run_gmail_client_and_watch():
                     return False
 
             else:
-                print(f'Credential invalid. Expired: {creds.expired}, Refresh token: {creds.referesh}')
-                msg = f'Credential invalid. Expired: {creds.expired}, Refresh token: {creds.referesh}. https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch'
+                print(f'Credential invalid. Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
+                msg = f'Credential invalid. Expired: {creds.expired}, Refresh token: {creds.refresh_token}. https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch'
                 bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
                 return False
 
