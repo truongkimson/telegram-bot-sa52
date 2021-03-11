@@ -171,6 +171,7 @@ def call_watch():
     history_id = gmail.users().watch(
         userId='me', body=request_body).execute()['historyId']
     save_history_id_to_db(history_id)
+    print(f'Expiry: {creds.expiry}, Refresh token: {creds.refresh_token}, Expired: {creds.expired}')
     return f'HistoryId = {history_id}'
 
 
@@ -230,7 +231,7 @@ def oauth2callback():
     # verify the authorization server response.
     state = flask.session['state']
     authorization_response = flask.request.url
-    print(authorization_response)
+
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
     flow.redirect_uri = flask.url_for('oauth2callback', next=next, _external=True)
@@ -289,6 +290,11 @@ def luminus_announcement():
                 creds.refresh(Request())
             except GoogleAuthError as e:
                 print(f'An error occured: {e}')
+                print(f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
+                msg = f'An error occured: {e}. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}. {flask.url_for("authorize", next="test_api_request", _external=True)}'
+                bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
+                return 'Refresh error'
+
         else:
             print(f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
             msg = f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}. {flask.url_for("authorize", next="test_api_request", _external=True)}'
@@ -334,6 +340,8 @@ def luminus_announcement():
         print('Non-MessageAdded webhook')
     history_id = history_list['historyId']
     save_history_id_to_db(history_id)
+    save_creds_to_db(creds)
+    print(f'Expiry: {creds.expiry}, Refresh token: {creds.refresh_token}, Expired: {creds.expired}')
     return 'ok'
 
 
