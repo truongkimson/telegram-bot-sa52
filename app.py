@@ -14,6 +14,7 @@ from flask import Flask, request
 from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id, test_group_chat_id, servant_group_chat_id
 from telebot import meme, stock
 from gmail.utils import trim_message
+from google.auth.exceptions import GoogleAuthError
 from db_lib.db_access import (get_creds_from_db,
                           save_creds_to_db,
                           delete_creds_from_db,
@@ -101,7 +102,7 @@ Commands available
         try:
             bot.send_voice(chat_id=chat_id, voice=yamete_file_id,
                            reply_to_message_id=msg_id)
-        except Exception as e:
+        except GoogleAuthError as e:
             print(e)
 
     elif text == '/meme' or text == f'/meme@{bot_user_name}':
@@ -183,9 +184,13 @@ def test_api_request():
     # load pickle into creds, check if still valid
     if not creds.valid:
         if creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+            try:
+                creds.refresh(Request())
+            except GoogleAuthError as e:
+                print(f'An error occured: {e}')
+                return redirect(flask.url_for('authorize', next='test_api_request'))
         else:
-            return redirect(flask.url_for('authorize'))
+            return redirect(flask.url_for('authorize', next='test_api_request'))
 
     # call Gmail API using creds credential
     gmail = googleapiclient.discovery.build(
@@ -280,7 +285,10 @@ def luminus_announcement():
     # load pickle into creds, check if still valid
     if not creds.valid:
         if creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+            try:
+                creds.refresh(Request())
+            except GoogleAuthError as e:
+                print(f'An error occured: {e}')
         else:
             print(f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
             msg = f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}. {flask.url_for("authorize", next="test_api_request", _external=True)}'
@@ -360,7 +368,7 @@ def run_gmail_client_and_watch():
             if creds.expired and creds.refresh_token:
                 try:
                     creds.refresh(Request())
-                except Exception as e:
+                except GoogleAuthError as e:
                     print(e)
                     msg = f'{e}. https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch'
                     bot.send_message(chat_id=test_group_chat_id, text=msg, disable_web_page_preview=True)
