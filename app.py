@@ -14,7 +14,7 @@ from flask import Flask, request
 from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id, test_group_chat_id, servant_group_chat_id
 from telebot import meme, stock
 from gmail.utils import trim_message
-from db.db_access import (get_creds_from_db,
+from db_lib.db_access import (get_creds_from_db,
                           save_creds_to_db,
                           delete_creds_from_db,
                           get_history_id_from_db,
@@ -401,6 +401,6 @@ if not run_gmail_client_and_watch():
 
 
 if __name__ == '__main__':
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-    app.run('localhost', 8080, threaded=True, debug=True)
-    # app.run(threaded=True)
+    # os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    # app.run('localhost', 8080, threaded=True, debug=True)
+    app.run(threaded=True)

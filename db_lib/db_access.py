@@ -10,9 +10,9 @@ GMAIL_ADDRESS = 'rtcbcotprinter@gmail.com'
 
 
 def get_creds_from_db():
-    conn = psycopg2.connect(host=DB_HOST, dbname=DB_NAME,
-                            user=DB_USERNAME, password=DB_PASSWORD)
-    # conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    # conn = psycopg2.connect(host=DB_HOST, dbname=DB_NAME,
+    #                         user=DB_USERNAME, password=DB_PASSWORD)
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cur = conn.cursor()
     cur.execute(
         "SELECT pickle FROM gmail WHERE name = %s;", (GMAIL_ADDRESS, ))
@@ -26,9 +26,9 @@ def get_creds_from_db():
 
 def save_creds_to_db(creds):
     pickle_byte = pickle.dumps(creds)
-    conn = psycopg2.connect(host=DB_HOST, dbname=DB_NAME,
-                            user=DB_USERNAME, password=DB_PASSWORD)    
-    # conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    # conn = psycopg2.connect(host=DB_HOST, dbname=DB_NAME,
+    #                         user=DB_USERNAME, password=DB_PASSWORD)    
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cur = conn.cursor()
     cur.execute(
         "SELECT EXISTS(SELECT pickle FROM gmail WHERE name = %s);", (GMAIL_ADDRESS, ))
@@ -45,9 +45,9 @@ def save_creds_to_db(creds):
 
 def delete_creds_from_db():
     result = False
-    conn = psycopg2.connect(host=DB_HOST, dbname=DB_NAME,
-                            user=DB_USERNAME, password=DB_PASSWORD)
-    # conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    # conn = psycopg2.connect(host=DB_HOST, dbname=DB_NAME,
+    #                         user=DB_USERNAME, password=DB_PASSWORD)
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cur = conn.cursor()
     cur.execute(
         "SELECT EXISTS(SELECT pickle FROM gmail WHERE name = %s);", (GMAIL_ADDRESS, ))
@@ -62,9 +62,9 @@ def delete_creds_from_db():
 
 
 def get_history_id_from_db():
-    conn = psycopg2.connect(host=DB_HOST, dbname=DB_NAME,
-                            user=DB_USERNAME, password=DB_PASSWORD)
-    # conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    # conn = psycopg2.connect(host=DB_HOST, dbname=DB_NAME,
+    #                         user=DB_USERNAME, password=DB_PASSWORD)
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cur = conn.cursor()
     cur.execute("SELECT history_id FROM history ORDER BY id DESC LIMIT 1;")
     result = cur.fetchone()
@@ -74,9 +74,9 @@ def get_history_id_from_db():
 
 
 def save_history_id_to_db(history_id):
-    conn = psycopg2.connect(host=DB_HOST, dbname=DB_NAME,
-                            user=DB_USERNAME, password=DB_PASSWORD)
-    # conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    # conn = psycopg2.connect(host=DB_HOST, dbname=DB_NAME,
+    #                         user=DB_USERNAME, password=DB_PASSWORD)
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cur = conn.cursor()
     ts = datetime.now(tz=gettz('Asia/Singapore'))
     cur.execute("INSERT INTO history (history_id, tstamp) VALUES (%s, %s);", (history_id, ts))
