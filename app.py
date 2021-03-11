@@ -11,7 +11,7 @@ from werkzeug.utils import redirect
 from flask import Flask, request
 from telebot.command import (Command_handler, start_command, help_command, hello_command, punish_command,
                              punish_hard_command, meme_command, stock_command)
-from telebot.credentials import (bot_token, URL, test_group_chat_id, servant_group_chat_id, guys_group_chat_id)
+from telebot.credentials import (bot_token, URL, test_group_chat_id, servant_group_chat_id)
 from google.auth.exceptions import GoogleAuthError
 from gmail.utils import get_msg_from_att
 from db_lib.db_access import (get_creds_from_db,
@@ -273,9 +273,7 @@ def luminus_announcement():
                                 bot.send_message(
                                     chat_id=test_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
                                 bot.send_message(
-                                    chat_id=guys_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
-                                # bot.send_message(
-                                #     chat_id=servant_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
+                                    chat_id=servant_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
     if msg == '':
         print('Non-MessageAdded webhook')
     history_id = history_list['historyId']
