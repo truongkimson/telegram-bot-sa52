@@ -25,13 +25,13 @@ TOKEN = bot_token
 bot = telegram.Bot(token=TOKEN)
 
 handler = Command_handler()
-handler.add_command(start_command)
-handler.add_command(help_command)
-handler.add_command(hello_command)
-handler.add_command(punish_command)
-handler.add_command(punish_hard_command)
-handler.add_command(meme_command)
-handler.add_command(stock_command)
+handler.add_command('/start', start_command)
+handler.add_command('/help', help_command)
+handler.add_command('/hello', hello_command)
+handler.add_command('/punish',punish_command)
+handler.add_command('/punish_hard', punish_hard_command)
+handler.add_command('meme', meme_command)
+handler.add_command('stock', stock_command)
 
 # Gmail client credentials
 CLIENT_SECRETS_FILE = 'gmail/client_id.json'
