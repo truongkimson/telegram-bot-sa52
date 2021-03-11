@@ -1,13 +1,4 @@
-from db_lib.db_access import (get_creds_from_db,
-                              save_creds_to_db,
-                              delete_creds_from_db,
-                              get_history_id_from_db,
-                              save_history_id_to_db)
-from google.auth.exceptions import GoogleAuthError
-from gmail.utils import trim_text
-from telebot import meme, stock
 import os
-import re
 import telegram
 import requests
 import email
@@ -15,16 +6,32 @@ import base64
 import flask
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
-from dateutil.tz import gettz
-from datetime import datetime
 from google.auth.transport.requests import Request
 from werkzeug.utils import redirect
 from flask import Flask, request
-from telebot.credentials import bot_token, bot_user_name, URL, yamete_file_id, test_group_chat_id, servant_group_chat_id, guys_group_chat_id
+from telebot.command import (Command_handler, start_command, help_command, hello_command, punish_command,
+                             punish_hard_command, meme_command, stock_command)
+from telebot.credentials import (bot_token, URL, test_group_chat_id, servant_group_chat_id, guys_group_chat_id)
+from google.auth.exceptions import GoogleAuthError
+from gmail.utils import get_msg_from_att
+from db_lib.db_access import (get_creds_from_db,
+                              save_creds_to_db,
+                              delete_creds_from_db,
+                              get_history_id_from_db,
+                              save_history_id_to_db)
 
 # Telegram bot token and create bot instance
 TOKEN = bot_token
 bot = telegram.Bot(token=TOKEN)
+
+handler = Command_handler()
+handler.add_command(start_command)
+handler.add_command(help_command)
+handler.add_command(hello_command)
+handler.add_command(punish_command)
+handler.add_command(punish_hard_command)
+handler.add_command(meme_command)
+handler.add_command(stock_command)
 
 # Gmail client credentials
 CLIENT_SECRETS_FILE = 'gmail/client_id.json'
@@ -49,81 +56,81 @@ def index():
 
 @app.route(f'/{TOKEN}', methods=['POST'])
 def respond():
-    print(request.get_json())
     update = telegram.Update.de_json(request.get_json(), bot)
+    print(request.get_json())
 
-    try:
-        if update.message:
-            update_message = update.message
-        elif update.edited_message:
-            update_message = update.edited_message
-        else:
-            return 'ok'
-        chat_id = update_message.chat.id
-        msg_id = update_message.message_id
-        text = update_message.text.encode('utf-8').decode()
-    except AttributeError as e:
-        print(e)
-        print(update_message)
-        return 'ok'
+    handler(bot, update)
+#     try:
+#         if update.message:
+#             update_message = update.message
+#         elif update.edited_message:
+#             update_message = update.edited_message
+#         else:
+#             return 'ok'
+#         chat_id = update_message.chat.id
+#         msg_id = update_message.message_id
+#         text = update_message.text.encode('utf-8').decode()
+#     except AttributeError as e:
+#         print(e)
+#         print(update_message)
+#         return 'ok'
 
-    if text == '/start' or text == f'/start@{bot_user_name}':
-        welcome_msg = '''
-Hi there!
-I'm Ale's assistant.
-'''
-        bot.send_message(chat_id=chat_id, text=welcome_msg,
-                         reply_to_message_id=msg_id)
+#     if text == '/start' or text == f'/start@{bot_user_name}':
+#         welcome_msg = '''
+# Hi there!
+# I'm Ale's assistant.
+# '''
+#         bot.send_message(chat_id=chat_id, text=welcome_msg,
+#                          reply_to_message_id=msg_id)
 
-    elif text == '/help' or text == f'/help@{bot_user_name}':
-        help_msg = '''
-Commands available
-/help - Show help
-/hello - Say hello to you
-/meme - Send a random meme scraped from reddit
-/stock - Check stock price. Usage: /stock [symbol]
-'''
-        bot.send_message(chat_id=chat_id, text=help_msg,
-                         reply_to_message_id=msg_id)
+#     elif text == '/help' or text == f'/help@{bot_user_name}':
+#         help_msg = '''
+# Commands available
+# /help - Show help
+# /hello - Say hello to you
+# /meme - Send a random meme scraped from reddit
+# /stock - Check stock price. Usage: /stock [symbol]
+# '''
+#         bot.send_message(chat_id=chat_id, text=help_msg,
+#                          reply_to_message_id=msg_id)
 
-    elif text == '/hello' or text == f'/hello@{bot_user_name}':
-        user_first_name = update.message.from_user.first_name
-        hello_msg = f'Hello {user_first_name}!'
-        bot.send_message(chat_id=chat_id, text=hello_msg,
-                         reply_to_message_id=msg_id)
+#     elif text == '/hello' or text == f'/hello@{bot_user_name}':
+#         user_first_name = update.message.from_user.first_name
+#         hello_msg = f'Hello {user_first_name}!'
+#         bot.send_message(chat_id=chat_id, text=hello_msg,
+#                          reply_to_message_id=msg_id)
 
-    elif text == '/punish' or text == f'/punish@{bot_user_name}':
-        user_first_name = update.message.from_user.first_name
-        punish_msg = 'Yamete kudasai~'
-        bot.send_message(chat_id=chat_id, text=punish_msg,
-                         reply_to_message_id=msg_id)
+#     elif text == '/punish' or text == f'/punish@{bot_user_name}':
+#         user_first_name = update.message.from_user.first_name
+#         punish_msg = f'Yamete kudasai~ Sama {user_first_name}'
+#         bot.send_message(chat_id=chat_id, text=punish_msg,
+#                          reply_to_message_id=msg_id)
 
-    elif text == '/punish_hard' or text == f'/punish_hard@{bot_user_name}':
-        user_first_name = update.message.from_user.first_name
-        try:
-            bot.send_voice(chat_id=chat_id, voice=yamete_file_id,
-                           reply_to_message_id=msg_id)
-        except GoogleAuthError as e:
-            print(e)
+#     elif text == '/punish_hard' or text == f'/punish_hard@{bot_user_name}':
+#         user_first_name = update.message.from_user.first_name
+#         try:
+#             bot.send_voice(chat_id=chat_id, voice=yamete_file_id,
+#                            reply_to_message_id=msg_id)
+#         except Exception as e:
+#             print(e)
 
-    elif text == '/meme' or text == f'/meme@{bot_user_name}':
-        url = meme.get_random_meme()
-        bot.send_photo(chat_id=chat_id, photo=url)
+#     elif text == '/meme' or text == f'/meme@{bot_user_name}':
+#         url = meme.get_random_meme()
+#         bot.send_photo(chat_id=chat_id, photo=url)
 
-    elif text.startswith('/stock') or text.startswith(f'/stock@{bot_user_name}'):
-        try:
-            symbol = text.strip().split()[1]
-            quote_msg = stock.get_quote(symbol)
-        except IndexError:
-            quote_msg = "Command usage: /stock [symbol]"
-        bot.send_message(chat_id=chat_id, text=quote_msg, reply_to_message_id=msg_id,
-                         parse_mode='HTML', disable_web_page_preview=True)
+#     elif text.startswith('/stock') or text.startswith(f'/stock@{bot_user_name}'):
+#         try:
+#             symbol = text.strip().split()[1]
+#             quote_msg = stock.get_quote(symbol)
+#         except IndexError:
+#             quote_msg = "Command usage: /stock [symbol]"
+#         bot.send_message(chat_id=chat_id, text=quote_msg, reply_to_message_id=msg_id,
+#                          parse_mode='HTML', disable_web_page_preview=True)
 
-    elif update.message.reply_to_message:
-        reply_msg = 'Sorry I don\'t understand'
-        bot.send_message(chat_id=chat_id, text=reply_msg,
-                         reply_to_message_id=msg_id)
-
+#     elif update.message.reply_to_message:
+#         reply_msg = 'Sorry I don\'t understand'
+#         bot.send_message(chat_id=chat_id, text=reply_msg,
+#                          reply_to_message_id=msg_id)
     return 'ok'
 
 
@@ -299,7 +306,8 @@ def luminus_announcement():
                 print(f'An error occured: {e}')
                 print(
                     f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
-                msg = f'An error occured: {e}. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}. {flask.url_for("authorize", next="test_api_request", _external=True)}'
+                msg = (f'An error occured: {e}. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}.' +
+                       f'{flask.url_for("authorize", next="test_api_request", _external=True)}')
                 bot.send_message(chat_id=test_group_chat_id,
                                  text=msg, disable_web_page_preview=True)
                 return 'Refresh error'
@@ -307,7 +315,8 @@ def luminus_announcement():
         else:
             print(
                 f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
-            msg = f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}. {flask.url_for("authorize", next="test_api_request", _external=True)}'
+            msg = (f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}.' +
+                   f'{flask.url_for("authorize", next="test_api_request", _external=True)}')
             bot.send_message(chat_id=test_group_chat_id,
                              text=msg, disable_web_page_preview=True)
             return 'Client unavailable'
@@ -331,24 +340,14 @@ def luminus_announcement():
                     if list(mime_msg.iter_attachments()).__len__() > 0:
                         attachments = list(mime_msg.iter_attachments())
                         for att in attachments:
-                            for part in att.walk():
-                                if 'From' in part:
-                                    msg += f'&lt;&lt;Update&gt;&gt;\n<b>From:</b> {trim_text(part.get("From"))}\n'
-                                    received_date = datetime.strptime(part.get('Date'), '%a, %d %b %Y %H:%M:%S %z')\
-                                        .astimezone(tz=gettz('Asia/Singapore'))
-                                    msg += received_date.strftime(
-                                        '%H:%M %a, %d %b, %Y \n')
-                                    msg += f'<b>Subject:</b> {trim_text(part.get("Subject"))}\n\n'
-                                if (part.get_content_type() == 'text/plain'):
-                                    msg += trim_text(part.get_content())[:400] + ' --truncated'
-
-                            print(msg)
-                            bot.send_message(
-                                chat_id=test_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
-                            bot.send_message(
-                                chat_id=guys_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
-                            # bot.send_message(
-                            #     chat_id=servant_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
+                            msg = get_msg_from_att(att)
+                            if (msg != ''):
+                                bot.send_message(
+                                    chat_id=test_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
+                                bot.send_message(
+                                    chat_id=guys_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
+                                # bot.send_message(
+                                #     chat_id=servant_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
     if msg == '':
         print('Non-MessageAdded webhook')
     history_id = history_list['historyId']
@@ -393,7 +392,8 @@ def run_gmail_client_and_watch():
                 except GoogleAuthError as e:
                     print(
                         f'{e}. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
-                    msg = f'{e}. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}. https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch'
+                    msg = (f'{e}. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}.' +
+                           'https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch')
                     bot.send_message(chat_id=test_group_chat_id,
                                      text=msg, disable_web_page_preview=True)
                     return False
@@ -401,7 +401,8 @@ def run_gmail_client_and_watch():
             else:
                 print(
                     f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}')
-                msg = f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}. https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch'
+                msg = (f'Credential invalid. Expiry: {creds.expiry}, Expired: {creds.expired}, Refresh token: {creds.refresh_token}.' +
+                       'https://polar-ridge-56723.herokuapp.com/gmail/authorize?next=call_watch')
                 bot.send_message(chat_id=test_group_chat_id,
                                  text=msg, disable_web_page_preview=True)
                 return False
