@@ -30,8 +30,8 @@ handler.add_command('/help', help_command)
 handler.add_command('/hello', hello_command)
 handler.add_command('/punish', punish_command)
 handler.add_command('/punish_hard', punish_hard_command)
-handler.add_command('meme', meme_command)
-handler.add_command('stock', stock_command)
+handler.add_command('/meme', meme_command)
+handler.add_command('/stock', stock_command)
 
 # Gmail client credentials
 CLIENT_SECRETS_FILE = 'gmail/client_id.json'
