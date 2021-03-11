@@ -63,7 +63,7 @@ def hello_command(bot, update_message, chat_id, msg_id):
 def punish_command(bot, update_message, chat_id, msg_id):
     # /punish command
     user_first_name = update_message.from_user.first_name
-    punish_msg = f'Yamete kudasai~ Sama {user_first_name}~'
+    punish_msg = f'Yamete kudasai~ {user_first_name} sama~'
     bot.send_message(chat_id=chat_id, text=punish_msg,
                      reply_to_message_id=msg_id)
 
