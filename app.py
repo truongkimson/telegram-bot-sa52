@@ -58,7 +58,10 @@ def index():
 def respond():
     update = telegram.Update.de_json(request.get_json(), bot)
     print(request.get_json())
-    handler(bot, update)
+    try:
+        handler(bot, update)
+    except Exception as e:
+        print(e)
     return 'ok'
 
 
