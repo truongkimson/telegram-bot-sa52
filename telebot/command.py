@@ -7,9 +7,9 @@ class Command_handler():
         self.commands = {}
 
     def __call__(self, bot, update):
-        if hasattr(update, 'message'):
+        if hasattr(update, 'message') and update.massage:
             update_message = update.message
-        elif hasattr(update, 'edited_message'):
+        elif hasattr(update, 'edited_message') and update.edited_message:
             update_message = update.edited_message
         else:
             return
