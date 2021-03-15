@@ -2,6 +2,7 @@ import requests
 import json
 from .credentials import iex_token
 
+
 def get_quote(symbol):
     quote = requests.get(f'https://cloud.iexapis.com/stable/stock/{symbol}/quote?token={iex_token}')
     if quote.text == 'Unknown symbol':

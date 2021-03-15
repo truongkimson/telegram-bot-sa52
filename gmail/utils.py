@@ -32,7 +32,7 @@ def get_msg_from_att(att):
                 '%H:%M %a, %d %b, %Y \n')
             msg += f'<b>Subject:</b> {trim_text(part.get("Subject"))}\n\n'
         if (part.get_content_type() == 'text/plain'):
-            msg += trim_text(part.get_content())[:400] + ' --truncated'
+            msg += trim_text(part.get_content())[:200] + ' --truncated'
     return msg
 
 
