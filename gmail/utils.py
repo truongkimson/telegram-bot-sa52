@@ -1,7 +1,6 @@
 import re
 import os
 import html
-import base64
 import html2text
 from dateutil.tz import gettz
 from datetime import datetime
@@ -38,7 +37,7 @@ def get_msg_from_att(att):
         if part.get_content_type() == 'text/plain':
             msg += trim_text(part.get_content())[:200] + '\n--truncated'
         elif part.get_content_type() == 'text/html':
-            plain_txt = html2text(part.get_content())
+            plain_txt = html2text.html2text(part.get_content())
             msg += trim_text(plain_txt)[:200] + '\n--truncated'
             print(msg)
 
