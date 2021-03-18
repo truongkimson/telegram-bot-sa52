@@ -28,20 +28,20 @@ def get_msg_from_att(att):
                 msg = ''
                 return msg
             msg += f'&lt;&lt;Update&gt;&gt;\n<b>From:</b> {trim_text(part.get("From"))}\n'
+
             received_date = datetime.strptime(part.get('Date'), '%a, %d %b %Y %H:%M:%S %z')\
                 .astimezone(tz=gettz('Asia/Singapore'))
             msg += received_date.strftime(
-                '%H:%M %a, %d %b, %Y \n')
+                '%H:%M %a, %d %b, %Y \n\n')
+
             msg += f'<b>Subject:</b> {trim_text(part.get("Subject"))}\n\n'
         if part.get_content_type() == 'text/plain':
-            msg += trim_text(part.get_content())[:200] + ' --truncated'
+            msg += trim_text(part.get_content())[:200] + '\n--truncated'
         elif part.get_content_type() == 'text/html':
-            try:
-                plain_txt = html2text(part.get_content())
-                msg += trim_text(plain_txt)[:200] + ' --truncated'
-                print(msg)
-            except Exception as e:
-                print(e)
+            plain_txt = html2text(part.get_content())
+            msg += trim_text(plain_txt)[:200] + '\n--truncated'
+            print(msg)
+
     return msg
 
 
