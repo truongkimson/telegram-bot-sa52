@@ -35,11 +35,9 @@ def get_msg_from_att(att):
 
             msg += f'<b>Subject:</b> {trim_text(part.get("Subject"))}\n\n'
         if part.get_content_type() == 'text/plain':
-            msg += 'Plain text\n'
             msg += trim_text(part.get_content())[:200] + '\n--truncated'
             return msg
         elif part.get_content_type() == 'text/html':
-            msg += 'Html text\n'
             plain_txt = html2text.html2text(part.get_content())
             msg += trim_text(plain_txt)[:200] + '\n--truncated'
             print(msg)
