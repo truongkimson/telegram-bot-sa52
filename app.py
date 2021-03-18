@@ -275,8 +275,8 @@ def luminus_announcement():
                             if (msg != ''):
                                 bot.send_message(
                                     chat_id=test_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
-                                bot.send_message(
-                                    chat_id=sa52_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
+                                # bot.send_message(
+                                #     chat_id=sa52_group_chat_id, text=msg, parse_mode='HTML', disable_web_page_preview=True)
     if msg == '':
         print('Non-MessageAdded webhook')
     history_id = history_list['historyId']

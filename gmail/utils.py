@@ -1,6 +1,8 @@
 import re
 import os
 import html
+import base64
+import html2text
 from dateutil.tz import gettz
 from datetime import datetime
 
@@ -22,7 +24,7 @@ def get_msg_from_att(att):
     msg = ''
     for part in att.walk():
         if 'From' in part:
-            if (is_file_submit_confirmation(part.get('Subject'))):
+            if is_file_submit_confirmation(part.get('Subject')):
                 msg = ''
                 return msg
             msg += f'&lt;&lt;Update&gt;&gt;\n<b>From:</b> {trim_text(part.get("From"))}\n'
@@ -31,8 +33,13 @@ def get_msg_from_att(att):
             msg += received_date.strftime(
                 '%H:%M %a, %d %b, %Y \n')
             msg += f'<b>Subject:</b> {trim_text(part.get("Subject"))}\n\n'
-        if (part.get_content_type() == 'text/plain'):
+        if part.get_content_type() == 'text/plain':
             msg += trim_text(part.get_content())[:200] + ' --truncated'
+        elif part.get_content_type() == 'text/html':
+            body_data_base64 = part.get('data')
+            html_str = base64.urlsafe_b64decode(body_data_base64).decode('utf-8')
+            plain_txt = html2text(html_str)
+            msg += trim_text(plain_txt)[:200] + ' --truncated'
     return msg
 
 
