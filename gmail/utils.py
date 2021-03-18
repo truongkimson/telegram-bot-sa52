@@ -37,11 +37,9 @@ def get_msg_from_att(att):
             msg += trim_text(part.get_content())[:200] + ' --truncated'
         elif part.get_content_type() == 'text/html':
             try:
-                body_data_base64 = part.get_content()
-                print(body_data_base64)
-                html_str = base64.urlsafe_b64decode(body_data_base64).decode('utf-8')
-                plain_txt = html2text(html_str)
+                plain_txt = html2text(part.get_content())
                 msg += trim_text(plain_txt)[:200] + ' --truncated'
+                print(msg)
             except Exception as e:
                 print(e)
     return msg
