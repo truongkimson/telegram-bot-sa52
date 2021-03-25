@@ -43,7 +43,7 @@ API_VERSION = 'v1'
 DATABASE_URL = os.environ['DATABASE_URL']
 
 
-# start Flask app
+# define Flask app
 app = Flask(__name__)
 # set secret_key for sessions
 app.secret_key = b'3fds9*(#*)(fl232#(LK!@_fdAavnmk:'
@@ -362,11 +362,9 @@ def run_gmail_client_and_watch():
         return False
 
 
-if not run_gmail_client_and_watch():
-    print('Gmail client not instantiated.')
-
-
 if __name__ == '__main__':
+    if not run_gmail_client_and_watch():
+        print('Gmail client not instantiated.')
     # os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     # app.run('localhost', 8080, threaded=True, debug=True)
     app.run(threaded=True)
