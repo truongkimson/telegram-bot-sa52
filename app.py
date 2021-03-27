@@ -158,7 +158,7 @@ def authorize():
     flow.redirect_uri = flask.url_for(
         'oauth2callback', next=next, _external=True)
 
-    authorization_url, state = flow.authorization_url(access_type='offline')
+    authorization_url, state = flow.authorization_url(access_type='offline', prompt='consent')
     # Store state so the callback can verify the auth server response.
     flask.session['state'] = state
 
@@ -362,9 +362,11 @@ def run_gmail_client_and_watch():
         return False
 
 
+if not run_gmail_client_and_watch():
+    print('Gmail client not instantiated.')
+
+
 if __name__ == '__main__':
-    if not run_gmail_client_and_watch():
-        print('Gmail client not instantiated.')
     # os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     # app.run('localhost', 8080, threaded=True, debug=True)
     app.run(threaded=True)
