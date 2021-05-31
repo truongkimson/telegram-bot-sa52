@@ -3,6 +3,8 @@
 # Intro
 Source code for Telegram chat bot used in NUS ISS GdipSA cohort 52's students chat room.
 
+The bot is currently hosted on Heroku. The bot can be found on Telegram using @sa52_bot handle
+
 # Features
 The main functions are sending out reminders to submit daily temperature reading and updates from teaching staffs.
 
