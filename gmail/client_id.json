@@ -1,16 +1,2 @@
 {
-    "web": {
-        "client_id": "900463155508-0nmufrg7pr2e9d3ejk62k5117todfjpa.apps.googleusercontent.com",
-        "project_id": "thinking-banner-284203",
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-        "token_uri": "https://oauth2.googleapis.com/token",
-        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        "client_secret": "PiylQR7Q2OQq01jw-RZ5AaT7",
-        "redirect_uris": [
-            "https://polar-ridge-56723.herokuapp.com/gmail/oauth2callback?next=call_watch",
-            "http://localhost:8080/gmail/oauth2callback",
-            "https://polar-ridge-56723.herokuapp.com/gmail/oauth2callback?next=test_api_request",
-            "https://polar-ridge-56723.herokuapp.com/gmail/oauth2callback?next=gmail_index"
-        ]
-    }
 }
